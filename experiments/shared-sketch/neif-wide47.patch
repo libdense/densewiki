@@ -1,0 +1,11 @@
+--- a/src/semantic_cache.h
++++ b/src/semantic_cache.h
+@@ -52,7 +52,7 @@
+ constexpr int kD = 128;                // key dimensions
+ constexpr int kL = 16;                 // SimHash tables
+ constexpr int kB = 18;                 // bits per table
+-constexpr int kM = 15;                 // newest entries kept per bucket
++constexpr int kM = 47;                 // newest entries kept per bucket
+ constexpr int kFlip = 3;               // extra buckets per table
+ constexpr int kProbe = kFlip + 1;      // buckets read per table
+ constexpr int kNLog = 24;              // key ring of 2^kNLog entries

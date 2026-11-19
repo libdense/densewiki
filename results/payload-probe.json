@@ -1,0 +1,59 @@
+{
+  "enwik9_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+  "reference_sha256": "0b65bc79917f84b78f4974a2dc94d4d4c3fc6c0c53234bdcb6c282db802635a3",
+  "payload_sha256": "04ad198fedbecae46f1238f76ae6935b3c47d9e391e44587ea587939ddf243e9",
+  "payload_bytes": 85039910,
+  "weights_bytes": 3744629,
+  "payload_order_zero_bits_per_byte": 7.999997850694432,
+  "payload_zlib9_bytes": 85065861,
+  "samples": [
+    {
+      "source": "enwik9",
+      "offset": 0,
+      "bytes": 1000000,
+      "sha256": "369b688978f649681136198fb96db14c1616756260c55fb4b65e9bc049552cad",
+      "plausible_bytes": 252437,
+      "exact": true
+    },
+    {
+      "source": "enwik9",
+      "offset": 440000000,
+      "bytes": 1000000,
+      "sha256": "2dde09c5d9d2e0a50a19378602a46e3de2d785ed1bc8cdd041dd7033a77776b1",
+      "plausible_bytes": 111876,
+      "exact": true
+    },
+    {
+      "source": "enwik9",
+      "offset": 903000000,
+      "bytes": 1000000,
+      "sha256": "f61050308ad6311018c60b81db76a187c4cf37c4b3fee1aba5b3a9a99e8be452",
+      "plausible_bytes": 152099,
+      "exact": true
+    },
+    {
+      "source": "coded-payload",
+      "offset": 0,
+      "bytes": 1000000,
+      "sha256": "6630500fefe5fe8690ef07886c93f500a403ab930824c13962d3ec4ec0cbc9b7",
+      "plausible_bytes": 1002134,
+      "exact": true
+    },
+    {
+      "source": "coded-payload",
+      "offset": 40000000,
+      "bytes": 1000000,
+      "sha256": "224050955771b7eee6ff9260ea9e77d0fcd1d277f1afa2610cd98908f3c2e985",
+      "plausible_bytes": 1002093,
+      "exact": true
+    },
+    {
+      "source": "coded-payload",
+      "offset": 80000000,
+      "bytes": 1000000,
+      "sha256": "c845723d2ac66c66d63b2a85ba7c5cb2a540cf59a4753ed91201223cf0f518a7",
+      "plausible_bytes": 1002097,
+      "exact": true
+    }
+  ]
+}

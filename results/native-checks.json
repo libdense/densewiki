@@ -1,0 +1,88 @@
+{
+  "canonical_enwik9": {
+    "bytes": 1000000000,
+    "sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc"
+  },
+  "full_candidate_roundtrip_completed_locally": false,
+  "full_candidate_peak_rss_and_time_measured": false,
+  "full_run_provenance": "Parent release measurements. For a new candidate run, use tools/roundtrip.py.",
+  "local_memory_total_kib": 10206472,
+  "profiles": {
+    "size": {
+      "native_images_equal": {
+        "archive9": {
+          "native_bytes_compared": 673070,
+          "native_sha256": "afa1fc062847e279771a4e48b3ec1c21d6b7fb34e857b1d24b7aec3c93941a45",
+          "self_path_trailers_valid": true
+        },
+        "comp9": {
+          "native_bytes_compared": 673070,
+          "native_sha256": "49856e03c8b072cf6ef49dd08d34a7caf35a47c655c325bc78123b8ebee595d7",
+          "self_path_trailers_valid": true
+        }
+      },
+      "normal_startup": [
+        {
+          "mode": "encode",
+          "files": {
+            ".decomp_bin": {
+              "bytes": 198506,
+              "sha256": "b6ea5b4882eafe82dcd68f4c5cd2e55441846513eada19fb3847ff9cf159a7d2"
+            }
+          }
+        },
+        {
+          "mode": "decode",
+          "files": {
+            ".ready4cmix_decomp": {
+              "bytes": 85039910,
+              "sha256": "04ad198fedbecae46f1238f76ae6935b3c47d9e391e44587ea587939ddf243e9"
+            },
+            "weights-poc8m_w2048_tf2t3_pruned_v5k_np2.c5": {
+              "bytes": 3744629,
+              "sha256": "729694cba4969b7d833686ed3f597ff04d3b226da849d5f8004ec020a0ed9563"
+            }
+          }
+        }
+      ]
+    },
+    "prize": {
+      "native_images_equal": {
+        "archive9": {
+          "native_bytes_compared": 619918,
+          "native_sha256": "649273d843000f224ef7180624b5df6f39c9e167f7f2599b9a0824ef1481bf91",
+          "self_path_trailers_valid": true
+        },
+        "comp9": {
+          "native_bytes_compared": 619918,
+          "native_sha256": "660f56c603c0c0549adbbf4c54721f531e3eaaa174108a3bea7e6bf4e7cbb8ad",
+          "self_path_trailers_valid": true
+        }
+      },
+      "normal_startup": [
+        {
+          "mode": "encode",
+          "files": {
+            ".decomp_bin": {
+              "bytes": 183814,
+              "sha256": "aa6daae03d26ae62f86dc91f3d03023fb6309625bef31bc0f89f0328a2cae736"
+            }
+          }
+        },
+        {
+          "mode": "decode",
+          "files": {
+            ".ready4cmix_decomp": {
+              "bytes": 85417870,
+              "sha256": "fc2d8c8f824e740ec8b06fa129316043c3876027449005d58df21d0f12254b57"
+            },
+            "weights-poc8m_w2048_tf2t3_pruned_v5k_np2.c5": {
+              "bytes": 3744629,
+              "sha256": "729694cba4969b7d833686ed3f597ff04d3b226da849d5f8004ec020a0ed9563"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

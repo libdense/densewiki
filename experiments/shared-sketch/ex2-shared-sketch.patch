@@ -1,0 +1,163 @@
+--- a/src/semantic_cache.h
++++ b/src/semantic_cache.h
+@@ -2,6 +2,7 @@
+ #define SEMANTIC_CACHE_H_
+ 
+ #include <stdint.h>
++#include "densewiki_sketch.h"
+ #include <stdio.h>
+ #include <string.h>
+ #include <x86intrin.h>
+@@ -124,13 +125,9 @@
+ static_assert(kKB * 2 == kD && kPre >= kK && kPre <= 512 && kK <= 32 && kGap < 4096 && kCalqE3 <= kQpE3 &&
+               kSpE3 <= kQpE3, "form");
+ 
+-// one bucket slot: entry counter + 1 (0 = empty) and its 96-bit sketch
+-struct Slot {
+-  uint32_t e1;
+-  uint32_t s2;    // sketch bits 64..95
+-  uint64_t s01;   // sketch bits 0..63
+-};
+-static_assert(sizeof(Slot) == 16, "slot layout");
++// DenseWiki 2026-11-19. One sketch per live key, one insertion ID per bucket slot.
++using Slot = densewiki::BucketSlot;
++using SharedSketch = densewiki::SketchTable<(size_t)kL << kB, kM, kN>;
+ 
+ struct State {
+   uint8_t* key;     // kN x kKB (ring of int4 keys)
+--- a/src/predictor.cpp
++++ b/src/predictor.cpp
+@@ -834,7 +834,7 @@
+     _mm_storeu_si128((__m128i*)(out + r), _mm_add_epi32(_mm256_castsi256_si128(t), _mm256_extracti128_si256(t, 1)));
+   }
+ }
+-// every cache line of one bucket (kM 16-byte slots: 4 or 5 lines)
++// Prefetch the contiguous insertion IDs of one bucket.
+ static inline void SemPfBucket(const semantic_cache::Slot* b) {
+   const uintptr_t e = (uintptr_t)(b + semantic_cache::kM) - 1;
+   for (uintptr_t a = (uintptr_t)b & ~(uintptr_t)63; a <= e; a += 64) __builtin_prefetch((const void*)a);
+@@ -875,37 +875,9 @@
+     _mm_storeu_si128((__m128i*)(dst + (a >> 1)), _mm256_castsi256_si128(o));
+   }
+ }
+-// first slot of a bucket with the smallest entry counter (unsigned), as the
+-// scan "um = 0; if (e1[u] < e1[um]) um = u"; reads 16 slots, the 16th (the next
+-// bucket or the table's padding) does not count
++// DenseWiki 2026-11-19. Preserve the first minimum at every bucket width.
+ static inline int SemOldest(const semantic_cache::Slot* sl) {
+-#if PORT_CMX_MEAS
+-  // research SEMCACHE capacity builds (driver 11-07, SEMCONST kM != 15): the same rule as the scan in the comment
+-  if (semantic_cache::kM != 15) {
+-    int um = 0;
+-    for (int u = 1; u < semantic_cache::kM; ++u) if (sl[u].e1 < sl[um].e1) um = u;
+-    return um;
+-  }
+-#else
+-  static_assert(semantic_cache::kM == 15, "15 slots per bucket");
+-#endif
+-  const __m256i* v = (const __m256i*)sl;
+-  const __m256i perm = _mm256_setr_epi32(0, 4, 1, 5, 2, 6, 3, 7);
+-  // counters of slots 0..7 and 8..15 in slot order
+-  const __m256i e0 = _mm256_permutevar8x32_epi32(_mm256_unpacklo_epi64(
+-      _mm256_unpacklo_epi32(_mm256_loadu_si256(v), _mm256_loadu_si256(v + 1)),
+-      _mm256_unpacklo_epi32(_mm256_loadu_si256(v + 2), _mm256_loadu_si256(v + 3))), perm);
+-  __m256i e1 = _mm256_permutevar8x32_epi32(_mm256_unpacklo_epi64(
+-      _mm256_unpacklo_epi32(_mm256_loadu_si256(v + 4), _mm256_loadu_si256(v + 5)),
+-      _mm256_unpacklo_epi32(_mm256_loadu_si256(v + 6), _mm256_loadu_si256(v + 7))), perm);
+-  e1 = _mm256_blend_epi32(e1, _mm256_set1_epi32(-1), 0x80);
+-  __m256i mn = _mm256_min_epu32(e0, e1);
+-  mn = _mm256_min_epu32(mn, _mm256_permute2x128_si256(mn, mn, 1));
+-  mn = _mm256_min_epu32(mn, _mm256_shuffle_epi32(mn, 0x4E));
+-  mn = _mm256_min_epu32(mn, _mm256_shuffle_epi32(mn, 0xB1));
+-  const unsigned k = (unsigned)_mm256_movemask_ps(_mm256_castsi256_ps(_mm256_cmpeq_epi32(e0, mn))) |
+-                     ((unsigned)_mm256_movemask_ps(_mm256_castsi256_ps(_mm256_cmpeq_epi32(e1, mn))) << 8);
+-  return __builtin_ctz(k);
++  return (int)semantic_cache::SharedSketch::oldest(sl);
+ }
+ // log-odds of a readout from its masses by bit value (part sums of the
+ // neighbours consistent with the prefix, SemPredBit) and its weight sum
+@@ -960,7 +932,7 @@
+   semantic_cache::State& s = sem_;
+   s.key = (uint8_t*)SemTable((size_t)kN * kKB, false);
+   s.val = (uint8_t*)SemTable((size_t)kN, false);
+-  s.slot = (Slot*)SemTable(((size_t)kL << kB) * kM * sizeof(Slot), true);
++  s.slot = (Slot*)SemTable(SharedSketch::bytes, true);
+   s.epos = (uint32_t*)SemTable((size_t)kN * 4, false);
+   s.hist = (uint8_t*)SemTable((size_t)kHist, false);
+   if (!s.key || !s.val || !s.slot || !s.epos || !s.hist) {
+@@ -974,7 +946,7 @@
+   // resident within 100 ms, after the pool had grown.  All of
+   // it is resident at the end anyway.  Zero-filled, so no value changes.
+   {
+-    const size_t n[5] = {(size_t)kN * kKB, (size_t)kN, ((size_t)kL << kB) * kM * sizeof(Slot),
++    const size_t n[5] = {(size_t)kN * kKB, (size_t)kN, SharedSketch::bytes,
+                          (size_t)kN * 4, (size_t)kHist};
+     void* const t[5] = {s.key, s.val, s.slot, s.epos, s.hist};
+     unsigned long long sum = 0;
+@@ -1065,6 +1037,7 @@
+     const uint32_t ri = (uint32_t)(s.nins & (kN - 1));
+     SemPut4(s.key + (size_t)ri * kKB, s.ck);
+     s.val[ri] = (uint8_t)strom_pb;
++    SharedSketch::store(s.slot, ri, s.c01, s.c2);
+     for (int t = 0; t < kL; ++t) {
+       Slot* sl = s.slot + (((size_t)t << kB) + s.chb[t]) * kM;
+       const int um = SemOldest(sl);
+@@ -1075,8 +1048,6 @@
+       }
+ #endif
+       sl[um].e1 = (uint32_t)s.nins + 1u;
+-      sl[um].s2 = s.c2;
+-      sl[um].s01 = s.c01;
+     }
+     s.epos[ri] = (uint32_t)(s.spos - 1);
+     ++s.nins;
+@@ -1295,7 +1266,7 @@
+       const uint32_t e1 = sl[u].e1;
+       if (e1 == 0u || (uint64_t)(e1 - 1u) < oldest) continue;
+       if ((uint64_t)(e1 - 1u) >= enear) continue;
+-      const int hm = __builtin_popcountll(q01 ^ sl[u].s01) + __builtin_popcount(q2 ^ sl[u].s2);
++      const int hm = (int)SharedSketch::distance(s.slot, e1 - 1u, q01, q2);
+       s.cand_hm[nc] = (uint8_t)hm;
+       s.cand_e[nc] = e1 - 1u;
+       ++cnt[hm + 1];
+@@ -2059,7 +2030,7 @@
+   semantic_cache::State& s = *cmx_sk_[sk];
+   s.key = (uint8_t*)SemTable((size_t)kN * kKB, false);
+   s.val = (uint8_t*)SemTable((size_t)kN, false);
+-  s.slot = (Slot*)SemTable(((size_t)kL << kB) * kM * sizeof(Slot), true);
++  s.slot = (Slot*)SemTable(SharedSketch::bytes, true);
+   s.epos = (uint32_t*)SemTable((size_t)kN * 4, false);
+   s.hist = (uint8_t*)SemTable((size_t)kHist, false);
+   if (!s.key || !s.val || !s.slot || !s.epos || !s.hist) {
+@@ -2073,7 +2044,7 @@
+   // resident within 100 ms, after the pool had grown.  All of
+   // it is resident at the end anyway.  Zero-filled, so no value changes.
+   {
+-    const size_t n[5] = {(size_t)kN * kKB, (size_t)kN, ((size_t)kL << kB) * kM * sizeof(Slot),
++    const size_t n[5] = {(size_t)kN * kKB, (size_t)kN, SharedSketch::bytes,
+                          (size_t)kN * 4, (size_t)kHist};
+     void* const t[5] = {s.key, s.val, s.slot, s.epos, s.hist};
+     unsigned long long sum = 0;
+@@ -2122,12 +2093,11 @@
+     const uint32_t ri = (uint32_t)(s.nins & (kN - 1));
+     SemPut4(s.key + (size_t)ri * kKB, s.ck);
+     s.val[ri] = (uint8_t)strom_pb;
++    SharedSketch::store(s.slot, ri, s.c01, s.c2);
+     for (int t = 0; t < kL; ++t) {
+       Slot* sl = s.slot + (((size_t)t << kB) + s.chb[t]) * kM;
+       const int um = SemOldest(sl);
+       sl[um].e1 = (uint32_t)s.nins + 1u;
+-      sl[um].s2 = s.c2;
+-      sl[um].s01 = s.c01;
+     }
+     s.epos[ri] = (uint32_t)(s.spos - 1);
+     ++s.nins;
+@@ -2313,7 +2283,7 @@
+       const uint32_t e1 = sl[u].e1;
+       if (e1 == 0u || (uint64_t)(e1 - 1u) < oldest) continue;
+       if ((uint64_t)(e1 - 1u) >= enear) continue;
+-      const int hm = __builtin_popcountll(q01 ^ sl[u].s01) + __builtin_popcount(q2 ^ sl[u].s2);
++      const int hm = (int)SharedSketch::distance(s.slot, e1 - 1u, q01, q2);
+       s.cand_hm[nc] = (uint8_t)hm;
+       s.cand_e[nc] = e1 - 1u;
+       ++cnt[hm + 1];
