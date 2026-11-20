@@ -1,0 +1,27 @@
+{
+  "profile": "size",
+  "flat_sha256": "d3d7d0708597baef9b55259f7a63541494e173e93b046de06444d6819b29715a",
+  "flat_bytes": 12311,
+  "old_head_bytes": 7919,
+  "new_head_bytes": 7597,
+  "candidate_coded_bytes": 6841,
+  "candidate_decoder_prefix_sha256": "9317d7b84aa3c3c089a03e79c714ca7ca0d6c70a78d6cf6ee34dc509c91b3fb1",
+  "files": {
+    "comp9": {
+      "upstream_bytes": 4057131,
+      "bytes": 4056809,
+      "sha256": "b7efc3e8aafec92353e5047397510e6a92ef357be9f101fd5f066e1f46aea4a2",
+      "unchanged_suffix_bytes": 4049212,
+      "unchanged_suffix_sha256": "5d7191b1d92f1187e7ac1b6f7dd889102f95bae074ddbb44b633cad65bf48332"
+    },
+    "archive9": {
+      "upstream_bytes": 88983124,
+      "bytes": 88982802,
+      "sha256": "4659522f09a1055b6663d0467960e352bbf93f687b19ad2277a574476b2a3c07",
+      "unchanged_suffix_bytes": 88975205,
+      "unchanged_suffix_sha256": "2f043c4a157cc8804cffad4889e74dd35b57c338ab2cfe05173d0100ea42c6f5"
+    }
+  },
+  "total_bytes": 93039611,
+  "saving_bytes": 644
+}

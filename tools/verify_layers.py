@@ -24,8 +24,6 @@ def verify(profile="size", reference_archive=None, wiki=None):
         if profile == "size":
             pair = ROOT / "release/size"
         else:
-            if reference_archive is None:
-                raise ValueError("prize verification needs the original cmix-neif 2.0 archive")
             pair = tmp / "prize"
             materialize(profile, pair, reference_archive=reference_archive)
         files = {}

@@ -78,6 +78,7 @@ def linked_image(p, coded, cwd):
     narrow = tree_bits and max(sum(bank) for bank in p["weights"]) * cap * boost + p["prior"] < (1 << 20)
     macros = {"DW_ELF_ARENA": int(arena), "DW_SPARSE": int(sparse), "DW_SHORT_KEYS": int(short_keys),
               "DW_NARROW": int(bool(narrow)), "DW_CLASSES": int(bool(p.get("classes"))), "DW_CLASS_LIST": ",".join(map(str, p.get("classes", []))),
+              "DW_RELATIVE27": int(p.get("address_filter") == "relative27"),
               "DW_TREE_BITS": tree_bits, "DW_EXACT": int(exact), "DW_BOOST": boost, "DW_DECAY": decay, "DW_KEEP": keep, "DW_BRANCHES": int(p.get("branches", False)),
               "BOOT_NM": len(masks), "BOOT_TB": 22, "BOOT_SHIFT": 42, "BOOT_TSZ": table_bytes,
               "BOOT_EPS": p["prior"], "BOOT_CAP": cap, "DW_REGION_SHIFT": p["region_shift"],
@@ -158,6 +159,29 @@ def branch_transform(data, inverse=False):
     return bytes(out)
 
 
+def relative27(data, inverse=False):
+    """Normalize eligible 27-bit relative operands to a shared image coordinate."""
+    out = bytearray(data)
+    i = 0
+    half = 1 << 26
+    mask = 2 * half - 1
+    while i + 4 < len(out):
+        opcode = out[i]
+        i += 1
+        if opcode & 254 != 232:
+            if i + 4 >= len(out) or not opcode & 1 or out[i] & 199 != 5:
+                continue
+            i += 1
+        value = struct.unpack_from("<I", out, i)[0]
+        if ((value + half) & 0xffffffff) > mask:
+            continue
+        end = i + 4
+        value = ((value + (-end if inverse else end) + half) & mask) - half
+        struct.pack_into("<I", out, i, value & 0xffffffff)
+        i = end
+    return bytes(out)
+
+
 def build(args):
     source = args.upstream.resolve()
     destination = args.output.resolve()
@@ -184,10 +208,14 @@ def build(args):
         raw = convert("decode", "unpack-original", original, ORIGINAL)
         if digest(raw) != FLAT_HASH or convert("encode", "recode-original", raw, ORIGINAL) != original:
             raise ValueError("canonical upstream bootstrap did not round-trip")
-        prepared = branch_transform(raw) if policy.get("branches") else raw
+        addr = policy.get("address_filter")
+        if addr not in (None, "relative27") or (addr and policy.get("branches")):
+            raise ValueError("unsupported startup transform")
+        transform = relative27 if addr else branch_transform if policy.get("branches") else None
+        prepared = transform(raw) if transform else raw
         encoded = convert("encode", "encode-candidate", prepared, policy)
         restored = convert("decode", "decode-candidate", encoded, policy)
-        if (branch_transform(restored, True) if policy.get("branches") else restored) != raw:
+        if (transform(restored, True) if transform else restored) != raw:
             raise ValueError("candidate bootstrap did not round-trip")
         head = linked_image(policy, encoded, temp)
         files = {name: with_head(data, head) for name, data in inputs.items()}

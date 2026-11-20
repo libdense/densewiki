@@ -1,0 +1,64 @@
+{
+  "profile": "prize",
+  "reference": "cmix-neif 2.0",
+  "files": {
+    "comp9": {
+      "reference_sha256": "976bf2d309707ab555e0c92720da5508ff0e5e6b846fc7082234262b06767f82",
+      "candidate_sha256": "066a801fb5a1844f82732f650c003742dd6aaccf71ea3a16cfa3d4447e7ca1f2",
+      "identical_suffix_bytes": 4034645,
+      "identical_suffix_sha256": "2f7c133ea9c2601cf5ec618287374bdfc5e1db089d04ca3228d0bebdd4fd5a44"
+    },
+    "archive9": {
+      "reference_sha256": "88dd7087404122d010261e6855afd88875d34dde1f0539377d3e832fc0f6b3fd",
+      "candidate_sha256": "3f0cada1b781742be9312b20c00bc6f3d56298d507e1e4b347d9bea21c8b247d",
+      "identical_suffix_bytes": 89338473,
+      "identical_suffix_sha256": "0e30736f7990cde0f1240804c45c4d1122104c3e7a00012080eb3b89c400ff57"
+    }
+  },
+  "native_images": {
+    "comp9": {
+      "native_bytes_compared": 619918,
+      "native_sha256": "660f56c603c0c0549adbbf4c54721f531e3eaaa174108a3bea7e6bf4e7cbb8ad",
+      "self_path_trailers_valid": true
+    },
+    "archive9": {
+      "native_bytes_compared": 619918,
+      "native_sha256": "649273d843000f224ef7180624b5df6f39c9e167f7f2599b9a0824ef1481bf91",
+      "self_path_trailers_valid": true
+    }
+  },
+  "decoder_prefix_bytes": 183563,
+  "weights_bytes": 3744629,
+  "payload_bytes": 85417870,
+  "trailer_bytes": 8,
+  "entry_points": {
+    "encode": {
+      "mode": "encode",
+      "files": {
+        ".decomp_bin": {
+          "bytes": 183563,
+          "sha256": "d3afe130359a113be6e379d0b5d8c66295f03cbd0d867e6845193dbedf6411de"
+        }
+      }
+    },
+    "decode": {
+      "mode": "decode",
+      "files": {
+        ".ready4cmix_decomp": {
+          "bytes": 85417870,
+          "sha256": "fc2d8c8f824e740ec8b06fa129316043c3876027449005d58df21d0f12254b57"
+        },
+        "weights-poc8m_w2048_tf2t3_pruned_v5k_np2.c5": {
+          "bytes": 3744629,
+          "sha256": "729694cba4969b7d833686ed3f597ff04d3b226da849d5f8004ec020a0ed9563"
+        }
+      }
+    }
+  },
+  "encoder_prefix_test_input": {
+    "description": "canonical enwik9 used for decoder-prefix emission",
+    "bytes": 1000000000,
+    "sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc"
+  },
+  "full_candidate_enwik9_roundtrip": false
+}

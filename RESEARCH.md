@@ -1,81 +1,56 @@
-# DenseWiki v0.0.3 measurements
+# DenseWiki v0.0.4 measurements
 
-## What got smaller
+## What the book predicted correctly
 
-The size-profile pair saved 64 bytes relative to v0.0.2 and 644 bytes relative to Ex-Girlfriend 2.0. The prize-profile pair saved 502 bytes relative to v0.0.2 and 644 bytes relative to cmix-neif 2.0. Each native program and archive uses the same 7,597-byte startup block, with profile-specific header fields. The program that runs after unpacking, pretrained weights and complete compressed Wikipedia stream match the corresponding upstream profile byte for byte.
+Chapter 38 of Merlin Numa's *Dense-Region MMO Server Architecture* separates a reusable body from per-recipient details. Chapter 39 groups fields that change together. The libdense 0.4.4 research note on factored worksets retains one shared base plus exact exceptions. DWX4 applies these ideas to Wikipedia pages. When two census sentences have identical text around different numbers, the decoder reuses the whole sentence pattern and inserts the exact digit strings. A title such as `Lake Example (river)` can also supply `Lake Example` or its initial-lowercase variant. The compression transcript's deterministic replay principle applies to the numeric template cache. The stored row order and actual equality comparison are enough for both sides to recreate the same state.
 
-| Profile | Archive bytes | Compressor bytes | Total bytes | Wikipedia stream inside archive |
+In the final Wiki run, the encoder used 1,824,403 title references. Its 613,332 numeric-template hits covered 103,811,079 bytes of title-transformed line content. That coverage counts the lengths of matching lines. The measured compressed-byte contribution is in the table.
+
+## Full-corpus ablation
+
+| Step | Complete stream bytes | Saved at this step |
+|---|---:|---:|
+| Original XML, same framed PPMd backend | 219,177,276 | Baseline |
+| One corpus-wide word table and case/space rules | 209,164,230 | 10,013,046 |
+| XML fields and link-language rows | 208,534,385 | 629,845 |
+| Exact numeric templates | 208,362,910 | 171,475 |
+| Page order by shared topics | 205,874,624 | 2,488,286 |
+| Page-title references | 203,506,076 | 2,368,548 |
+| Wiki markup spellings | 202,788,311 | 717,765 |
+
+Every row used a single continuous PPMd member and restored all 1,000,000,000 bytes. Each row adds to the previous configuration. Page order changes which sentences reach the numeric cache, so these marginal effects depend on the order of the experiment. The complete representation saves **16,388,965 stream bytes** over framed raw PPMd. A separate unframed libarchive control stored raw enwik9 in 219,169,689 bytes including its 7z container. The comparison with the v0.0.3 runnable archive combines the new representation, backend and executable packaging.
+
+The handoff specifically asked whether v0.0.3 lost bytes by resetting XZ history. We extracted the actual LZMA2 members of all 954 shipped DWX3 blocks. The same 720,286,803 transformed bytes with a one-MiB dictionary used 249,684,076 independent raw LZMA2 bytes and 240,740,752 continuous bytes. The saving was **8,943,324 bytes**. These counts exclude DWX3 headers and XZ container overhead. Both paths restored the same transformed-byte hash. This separate control uses the older DWX3 representation. Its saving cannot be added to the DWX4 ladder.
+
+```bash
+python3 experiments/wiki-words/history_control.py ../densewiki-v0.0.3-enwik9-lowmem.pyz
+```
+
+## Which alternatives lost
+
+A separate paid dictionary of full wikilink targets emitted 2,597,413 references but grew the Wiki stream from 202,788,311 to 203,266,235 bytes, a cost of 477,924 bytes. The shipped vocabulary codes repeat words cheaply already. A high hit count alone gave the wrong decision.
+
+A block-local LZP pass used the last position following four bytes to copy matching passages without sending an offset. On the 8 MiB prefix, a minimum copy of eight bytes grew the word-and-row pilot from 2,082,085 to 2,109,675 bytes. At 64 bytes, the prefix saved 533 bytes, while the middle and late samples grew by 231 and 212 bytes respectively. Prefix, middle and late start at byte offsets 0, 429,000,000 and 903,000,000. The shipped design omits this pass.
+
+The Lean branch also tried LZMA2 levels 2 and 3 on the same earlier 8,192-word, 256 KiB representation before title and markup substitutions. Level 1 used 245,257,125 stream bytes, level 2 used 238,861,539, and level 3 used 234,366,056. Encoder RSS rose from 18.36 MiB to 25.86 MiB and 40.86 MiB in those trials. The release keeps level 1 and gains additional bytes through title and markup reuse. All three experimental streams passed full comparisons.
+
+## Actual memory and runtime
+
+| Released executable archive | Bytes with program | Encode seconds | Standalone decode seconds | Peak RSS encode / decode |
 |---|---:|---:|---:|---:|
-| size | 88,982,802 | 4,056,809 | 93,039,611 | 85,039,910 |
-| prize | 89,346,070 | 4,042,242 | 93,388,312 | 85,417,870 |
+| Wiki | 202,901,735 | 132.457 | 119.419 | 30.80 / 25.87 MiB |
+| Lean | 238,629,600 | 114.514 | 32.157 | 14.96 / 7.58 MiB |
 
-Prefix offsets, full SHA-256 values, suffix hashes, native image captures and no-argument startup checks are recorded in the release. The author-provided SHA-256 of the 89,346,392-byte original cmix-neif archive is `88dd7087404122d010261e6855afd88875d34dde1f0539377d3e832fc0f6b3fd`. [Size build](results/size.json), [prize build](results/prize.json), [original release directory](https://marwoelk.de/cmix-neif-2.0/).
+The release runs used GCC 14.2.0, libarchive 3.7.4 and Linux 6.18.57 on an AMD EPYC 9V74. Each process was pinned to one logical CPU. Other work used other logical CPUs. Encode and standalone decode times include file I/O and exclude verification. The runnable adds 113,424 bytes to either stream, including its trailer. The v0.0.3 benchmark recorded 339.824 s and 30.01 MiB for its CLI encode and 172.240 s and 16.00 MiB for its CLI decode. Those historical timings are stream measurements. Peak RSS excludes the filesystem cache. The final encodes used seekable scratch files on a disk-backed filesystem, while decode sought directly within its eventual output file.
 
-## Native startup memory
+A separate Lean decode with a small C launcher reported 6.94 MiB peak RSS and 31.270 seconds, with a complete byte comparison. The Python harness's fork can set a pre-exec high-water floor in the main table's Linux wait4 figures. All memory and time figures in this release concern these specific runs.
 
-The first stage hashes each byte history to a row of binary counts. v0.0.2's size profile addressed a 512 MiB table directly. v0.0.3 keeps a 4 MiB directory and gives a 512-byte row to a hash slot on its first use. Hash collisions still select the same row on both sides of the arithmetic coder. The 24 stencils over 12,311 bytes can allocate at most 295,464 rows. Including the directory and row zero, the reserved count arena is 148.27 MiB. The ELF loader supplies zero-filled pages, and the first stage releases the entire count arena before unpacking the inner executable.
+As one historical size reference, Matt Mahoney lists Boa 0.58b at 213,901,294 bytes including its program and about 17 MB of compression memory. His memory column is approximate and excludes temporary files. This is a published size comparison across different implementations and hosts. [Large Text Compression Benchmark](https://mattmahoney.net/dc/text.html).
 
-| Profile and entry | v0.0.2 peak RSS (KiB) | v0.0.3 peak RSS (KiB) | Reduction (MiB) |
-|---|---:|---:|---:|
-| size, compressor | 1,771,008 | 1,530,268 | 235.10 |
-| size, archive | 1,768,192 | 1,527,452 | 235.10 |
-| prize, compressor | 1,538,048 | 1,529,884 | 7.97 |
-| prize, decoder prefix only | 1,534,848 | 1,526,680 | 7.98 |
+## Native builds
 
-Each number is Linux `wait4` peak RSS for a separate single-CPU process through reconstruction and handoff of the native ELF. The test hook stops before the Wikipedia model's main function. The prize decoder's startup measurement used the complete executable prefix, and the separate native verification also exercised the full prize archive. [Startup memory](results/startup-memory.json), [size native checks](results/native-checks.json), [prize native checks](results/native-checks-prize.json).
+A 32-bit displacement depends on where an instruction sits. The startup transform stores eligible signed 27-bit operands in a common image coordinate system before entropy coding and reconstructs the original displacements before execution. The flat 12,311-byte image contained 500 recognized operand shapes, representing 494 distinct original displacements and 166 distinct normalized values. Recognition is a reversible byte-pattern rule. It does not require an instruction disassembler.
 
-## Lower-memory prize model
+The new mixer policy used 6,399 coded bytes for that flat image. The previous policy used 6,841. Including the inverse transform and model, the startup fell from 7,597 to 7,286 bytes. Both the compressor and the archive carry it, saving 622 combined bytes per profile. The complete compressed Wikipedia streams were identical to the respective parent streams, 85,039,910 bytes for Size and 85,417,870 bytes for Prize. The fresh native checks compare complete program images, suffixes, weights, payloads and decoder-prefix generation. The prize decoder reproduced 65,536 upstream model-stream bytes. Original XML and regenerated archive from a fresh multi-day native run remain unverified for these two builds.
 
-The experimental C++ model stores each semantic sketch once and shares it across buckets. Its five semantic-cache arrays use demand-zero base pages. PPMd starts with a 128 MiB resident pool and lets it grow to 1 GiB, backed by the same page file. The controller targets 8 GiB RSS before a 256 MiB safety margin. The original starts with 1 GiB and allows its pool to grow to 4 GiB. Other model allocations contribute to process RSS, and paging can affect runtime.
-
-The fixture starts at offset 87,537 in the included upstream profiling input. The original bytes also occur at the same offset in canonical enwik9. A reversible escape maps the excerpt into the model's 208-byte alphabet. Both benchmark builds set the gate to its article-body state at entry, load the real trained weights, and use the upstream Compress and Decompress functions. Semantic insertion counts show that both models queried and populated the cache. The harness skips the full-corpus preprocessing pass. It uses the same GCC floating-point settings for both models. Each test uses a fresh single-core process.
-
-| Original XML bytes | Model bytes | Identical encoded bytes | Cache inserts per run | Original encode/decode peak GiB | Lower-memory encode/decode peak GiB |
-|---:|---:|---:|---:|---:|---:|
-| 16,384 | 17,128 | 6,624 | 14,472 | 5.575 / 5.575 | 2.852 / 2.852 |
-| 32,768 | 36,110 | 11,464 | 27,080 | 6.365 / 6.364 | 3.670 / 3.670 |
-| 65,536 | 74,744 | 18,802 | 47,378 | 6.935 / 6.934 | 4.249 / 4.250 |
-
-Both encoders produced identical bytes on every listed input, and each decoder restored the other encoder's stream to the exact original XML. Longer streams can touch more semantic pages and spill more PPMd data to disk. The 8 GiB controller setting has yet to be tested on a complete native enwik9 encode and decode. The downloadable scored pairs use the upstream inner models. [Cross-decode and memory receipts](results/model-memory.json).
-
-## Full enwik9 text compression
-
-DWX3 stores article bodies together within each 1 MiB block. It writes a count and metadata length, then reconstructs complete text fields in order. Bytes at an incomplete field boundary stay in the original part of that block. A second reversible transform gives capitalized and uppercase words access to lowercase dictionary entries. The encoder compares raw, vocabulary-only and combined representations, including their actual XZ byte cost. It limits the XZ dictionary to the block size, up to 1 MiB. Both codecs use Python and the standard library's XZ implementation.
-
-| Full 1,000,000,000-byte corpus | Complete stream bytes | Bits per original byte | Single-process encode peak MiB | Single-process decode peak MiB |
-|---|---:|---:|---:|---:|
-| DWX2 | 255,483,667 | 2.043869 | 58.33 | 19.77 |
-| DWX3 | 249,751,347 | 1.998011 | 33.69 | 15.67 |
-
-DWX3 saved **5,732,320 bytes (2.24%)** on the full Wikipedia stream. Each single-process CLI run wrote its own archive and restored file, checked SHA-256, and compared all one billion output bytes to the reference. The independent block-parallel build produced the same stream hashes. The measurements above count the entire stream including its block headers and dictionaries. Python and its XZ runtime are installed dependencies. [Corpus verification](results/wiki-enwik9.json), [DWX2 single-process run](results/dwx2-enwik9-memory.json), [DWX3 single-process run](results/dwx3-enwik9-memory.json).
-
-On the 880,672-byte prefix, the DWX3 stream used 246,694 bytes with vocabulary coding alone, 243,566 after folding capitalization, and 242,850 after grouping text fields as well. Thus field grouping saved another 716 bytes with the other settings held fixed. These settings were explored on the two small upstream fixtures before the full-corpus comparison.
-
-| Input | DWX2 stream | DWX3 stream | DWX2 runnable | DWX3 runnable |
-|---|---:|---:|---:|---:|
-| wiki-prefix, 880,672 bytes | 247,974 | 242,850 | 249,424 | 244,862 |
-| profiling-tail, 50,051 bytes | 8,350 | 8,302 | 9,800 | 10,314 |
-
-Runnable sizes include the matching decoder source and ZIP framing. The larger new decoder increased the runnable size on the small tail even though it reduced the stream. [Excerpt benchmarks and ablations](results/wiki-words-v3.json).
-
-## Verification boundary
-
-The two ~93 MB scores use the native enwik9 profiles. Each was checked against a hash-pinned parent, including all unchanged compressed data and the complete restored program image. The native entry points were exercised in fresh directories. The DWX2 and DWX3 figures above have independent full-corpus round trips. Fresh full-corpus native peak memory, elapsed time and decoded output for DenseWiki v0.0.3 remain to be measured. Marcus Woelk reports 9.77 GiB for the original prize model's full encode and 9.75 GiB for its decode. Ryan Landay's size-profile receipt reports roughly 24.3 GiB. [cmix-neif 2.0](https://github.com/marwoelk/cmix-neif-2.0), [Ex-Girlfriend verification](upstream/ex2-verification.json).
-
-## Connection to the project thesis
-
-Merlin Numa's *Dense-Region MMO Server Architecture* describes grouping recipients and reusing a serialized payload in the foreword's core principle. The libdense research note `docs/research/factored-worksets-0.4.4.md` represents shared state with exact exceptions. In the native startup decoder, many visits to the same context use one physical counter row. In DWX3, a word can share a dictionary entry across case variants while marker bytes preserve its exact spelling. The block-level ablation above measures what the grouping contributed to one Wikipedia prefix. Every transformation in the shipped codecs has an exact inverse.
-
-## Additional controls
-
-The published and v0.0.3 prize archives were also started with no arguments in fresh directories. After model initialization, both emitted the same first 16,384 bytes from the actual range-coded stream, preceding inverse Wikipedia preprocessing. This adds a native model observation beyond image and payload equality. [Native prefix comparison](results/native-model-prefix-prize.json).
-
-Reducing the inner native-program packer's table dimensions increased its encoded compressor-plus-decoder-prefix length by 698 bytes in the GCC control. The released native packages keep the original inner coder and use the sparse first-stage row layout. [Packer geometry trial](results/packer-geometry.json).
-
-Continuous XZ at preset 6 produced 230,153,052 bytes and restored the full reference. [Measurement](results/continuous-xz-enwik9.json).
-
-XZ in the v0.0.2 one-MiB block format produced 263,059,071 bytes and restored the full reference. [Measurement](results/blocked-xz-enwik9.json).
-
-All 954 enwik9 blocks selected combined article-field and case coding. The single-process fixed `--mode wiki` encode reproduced the identical stream in 431.6 seconds with 32.08 MiB peak RSS. Automatic selection took 1,141.0 seconds on the same host. These wall times include concurrent independent work. [Fixed-mode run](results/dwx3-wiki-enwik9-memory.json).
-
-The full standalone Python archive is 249,753,359 bytes. Its fresh decode restored all 1,000,000,000 input bytes with 15.75 MiB peak RSS. Its installed dependencies are Python and liblzma. [Standalone run](results/lowmem-runnable.json).
+[Native size checks](results/native-checks.json) | [Prize checks](results/native-checks-prize.json) | [Prize prefix](results/native-model-prefix-prize.json) | [Address counts](results/native-addresses.json).

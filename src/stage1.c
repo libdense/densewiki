@@ -171,7 +171,23 @@ static void decode_startup(void) {
         output[pos] = (uint8_t)prefix;
         history = (history << 8) | (uint8_t)prefix;
     }
-#if DW_BRANCHES
+#if DW_RELATIVE27
+    /* Equal targets have one representation throughout the flat startup image. */
+    for (unsigned i = 0; i + 4 < S2LEN;) {
+        unsigned op = output[i++];
+        if ((op & 254u) != 232u) {
+            if (i + 4 >= S2LEN || !(op & 1u) || (output[i] & 199u) != 5u) continue;
+            ++i;
+        }
+        uint32_t value;
+        __builtin_memcpy(&value, output + i, sizeof(value));
+        if (value + (1u << 26) >= (1u << 27)) continue;
+        unsigned end = i + 4;
+        value = ((value - end + (1u << 26)) & ((1u << 27) - 1u)) - (1u << 26);
+        __builtin_memcpy(output + i, &value, sizeof(value));
+        i = end;
+    }
+#elif DW_BRANCHES
     for (unsigned i = 0; i + 4u < S2LEN; ++i) {
         if ((unsigned)(output[i] - 232u) <= 1u) {
             uint32_t target;

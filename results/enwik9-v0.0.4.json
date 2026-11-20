@@ -1,0 +1,427 @@
+{
+  "release": "DenseWiki v0.0.4",
+  "date": "2026-11-20",
+  "corpus": "enwik9",
+  "input_bytes": 1000000000,
+  "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+  "hardware": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logical_cpus_visible": 9,
+    "kernel": "6.18.57",
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "compiler": "g++ and gcc 14.2.0",
+    "libarchive": "3.7.4",
+    "memory_total_kib": 10206472
+  },
+  "measurement": "Each stage is a fresh Linux process pinned to one logical CPU. Wall time includes I/O. Hashing and comparison are separate. Other jobs used other logical CPUs. One final timed pass per profile. RSS is Linux wait4, includes any pre-exec launcher high-water mark and excludes the filesystem cache. Temporary bytes are the largest sampled sum of unlinked regular-file sizes in the child process, sampled every 50 ms; destination is separate.",
+  "dependencies": "Runnable x86-64 Linux archives embed the released DWX4 program. Installed libarchive.so.13, system C and C++ runtime libraries and transitive dependencies are external. The ZIP download wrapper is excluded from runnable archive size.",
+  "wiki": {
+    "profile": "wiki",
+    "cpu": 0,
+    "machine": "x86_64",
+    "kernel": "6.18.57",
+    "executable_sha256": "78fb96ddda4b2679c46dc20ff8435ad6690b687c5bab98a3c0e2acad5d3e0a03",
+    "input_bytes": 1000000000,
+    "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "encode": {
+      "wall_seconds": 132.457,
+      "peak_rss_kib": 31536,
+      "user_seconds": 127.711,
+      "system_seconds": 4.343,
+      "sampled_temporary_file_bytes": 659455402
+    },
+    "pack": {
+      "wall_seconds": 0.202,
+      "peak_rss_kib": 7764,
+      "user_seconds": 0.008,
+      "system_seconds": 0.174,
+      "sampled_temporary_file_bytes": 0
+    },
+    "standalone_decode": {
+      "wall_seconds": 119.419,
+      "peak_rss_kib": 26488,
+      "user_seconds": 109.419,
+      "system_seconds": 5.701,
+      "sampled_temporary_file_bytes": 0
+    },
+    "stream_bytes": 202788311,
+    "stream_sha256": "8ac8b64afab406b2acabe406c0d9b7f04f792dd18035f9a7894af92f1e6b2c86",
+    "archive_bytes": 202901735,
+    "archive_sha256": "7b1ed487c288c6250f749341171766d0f4dff7f2b8f4ef0cbea04d55dc0e8310",
+    "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "byte_comparison": true,
+    "canonical_enwik9": true,
+    "decoder_and_trailer_bytes": 113424,
+    "observations": {
+      "vocabulary": 32768,
+      "template_hits": 613332,
+      "matched_source_bytes": 103811079,
+      "title_refs": 1824403
+    }
+  },
+  "lean": {
+    "profile": "lean",
+    "cpu": 1,
+    "machine": "x86_64",
+    "kernel": "6.18.57",
+    "executable_sha256": "78fb96ddda4b2679c46dc20ff8435ad6690b687c5bab98a3c0e2acad5d3e0a03",
+    "input_bytes": 1000000000,
+    "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "encode": {
+      "wall_seconds": 114.514,
+      "peak_rss_kib": 15316,
+      "user_seconds": 110.807,
+      "system_seconds": 3.485,
+      "sampled_temporary_file_bytes": 744278878
+    },
+    "pack": {
+      "wall_seconds": 0.152,
+      "peak_rss_kib": 7764,
+      "user_seconds": 0.008,
+      "system_seconds": 0.116,
+      "sampled_temporary_file_bytes": 0
+    },
+    "standalone_decode": {
+      "wall_seconds": 32.157,
+      "peak_rss_kib": 7764,
+      "user_seconds": 28.861,
+      "system_seconds": 3.177,
+      "sampled_temporary_file_bytes": 0
+    },
+    "stream_bytes": 238516176,
+    "stream_sha256": "d5f374d25e163e6b912c80bb7aa80b94b4647035b1977a583d57403162b08465",
+    "archive_bytes": 238629600,
+    "archive_sha256": "e33c36e2a1e6d8bed0d1279de61ce17d2add67fed43a2a70eec64c1915925e71",
+    "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "byte_comparison": true,
+    "canonical_enwik9": true,
+    "decoder_and_trailer_bytes": 113424,
+    "observations": {
+      "vocabulary": 8192,
+      "template_hits": 612913,
+      "matched_source_bytes": 103665645,
+      "title_refs": 1783077
+    }
+  },
+  "additional_lean_standalone_trial": {
+    "measurement": "Second full byte-compared decode using a small C parent followed by fork, execv and wait4, pinned to CPU 3.",
+    "peak_rss_kib": 7104,
+    "wall_seconds": 31.27
+  },
+  "native": {
+    "size": {
+      "profile": "size",
+      "flat_sha256": "d3d7d0708597baef9b55259f7a63541494e173e93b046de06444d6819b29715a",
+      "flat_bytes": 12311,
+      "old_head_bytes": 7919,
+      "new_head_bytes": 7286,
+      "candidate_coded_bytes": 6399,
+      "candidate_decoder_prefix_sha256": "da960fa7bb08d3653553e2db4d1bd532fba618302500a0b656a9d5e431e25a41",
+      "files": {
+        "comp9": {
+          "upstream_bytes": 4057131,
+          "bytes": 4056498,
+          "sha256": "3f21ea25dfdbff72792e45a3f28c580df8129d26e2e77b4009b711dde2937272",
+          "unchanged_suffix_bytes": 4049212,
+          "unchanged_suffix_sha256": "5d7191b1d92f1187e7ac1b6f7dd889102f95bae074ddbb44b633cad65bf48332"
+        },
+        "archive9": {
+          "upstream_bytes": 88983124,
+          "bytes": 88982491,
+          "sha256": "4fc59a8dfbe18ed0525dfa300f847e86b50e1fe32fff3829f77980c09d301b0a",
+          "unchanged_suffix_bytes": 88975205,
+          "unchanged_suffix_sha256": "2f043c4a157cc8804cffad4889e74dd35b57c338ab2cfe05173d0100ea42c6f5"
+        }
+      },
+      "total_bytes": 93038989,
+      "saving_bytes": 1266,
+      "change_vs_v003_combined_bytes": -622,
+      "full_enwik9_encode_decode": false
+    },
+    "prize": {
+      "profile": "prize",
+      "flat_sha256": "d3d7d0708597baef9b55259f7a63541494e173e93b046de06444d6819b29715a",
+      "flat_bytes": 12311,
+      "old_head_bytes": 7919,
+      "new_head_bytes": 7286,
+      "candidate_coded_bytes": 6399,
+      "candidate_decoder_prefix_sha256": "7994b80d31bb3cc245651db7aeeec94e4e6fbdde31134ba5f7688f6950c53708",
+      "files": {
+        "comp9": {
+          "upstream_bytes": 4042564,
+          "bytes": 4041931,
+          "sha256": "4684b6e94b78226ca6df39d83ad5949b6865272989de60c615b897d2d0b05ba8",
+          "unchanged_suffix_bytes": 4034645,
+          "unchanged_suffix_sha256": "2f7c133ea9c2601cf5ec618287374bdfc5e1db089d04ca3228d0bebdd4fd5a44"
+        },
+        "archive9": {
+          "upstream_bytes": 89346392,
+          "bytes": 89345759,
+          "sha256": "b59c5bda95c528a1a1c0f754c814b80d7d3d9a2e63902358c884c2dd3049fea5",
+          "unchanged_suffix_bytes": 89338473,
+          "unchanged_suffix_sha256": "0e30736f7990cde0f1240804c45c4d1122104c3e7a00012080eb3b89c400ff57"
+        }
+      },
+      "total_bytes": 93387690,
+      "saving_bytes": 1266,
+      "change_vs_v003_combined_bytes": -622,
+      "full_enwik9_encode_decode": false
+    }
+  },
+  "native_prize_prefix": {
+    "profile": "prize",
+    "unit": "first decoded model-stream bytes before inverse Wikipedia preprocessing",
+    "reference": {
+      "archive_sha256": "88dd7087404122d010261e6855afd88875d34dde1f0539377d3e832fc0f6b3fd",
+      "prefix_bytes": 65536,
+      "prefix_sha256": "b05e38eaacf2e8cee809d1f8d03cf75ec478937cefc518f81dd45f320b332f34",
+      "sampled_peak_tree_rss_kib": 5505664,
+      "wall_seconds": 101.358
+    },
+    "candidate": {
+      "archive_sha256": "b59c5bda95c528a1a1c0f754c814b80d7d3d9a2e63902358c884c2dd3049fea5",
+      "prefix_bytes": 65536,
+      "prefix_sha256": "b05e38eaacf2e8cee809d1f8d03cf75ec478937cefc518f81dd45f320b332f34",
+      "sampled_peak_tree_rss_kib": 5507016,
+      "wall_seconds": 88.967
+    },
+    "prefix_byte_comparison": "equal",
+    "full_enwik9_decode": false
+  },
+  "native_address_transform": {
+    "flat_input_bytes": 12311,
+    "normalized_operands": 500,
+    "eligible_shapes": {
+      "direct_branch_shape": 166,
+      "modrm_shape": 334
+    },
+    "distinct_original_displacements": 494,
+    "distinct_normalized_targets": 166,
+    "v003_startup_bytes": 7597,
+    "v004_startup_bytes": 7286,
+    "v003_coded_bytes": 6841,
+    "v004_coded_bytes": 6399,
+    "release_saving_per_executable": 311,
+    "combined_native_saving_per_pair": 622
+  },
+  "raw_ppmd_unframed_control_bytes": 219169689,
+  "controls": [
+    {
+      "profile": "raw",
+      "stream_bytes": 219177276,
+      "stream_sha256": "d0e70c83efeef84dccce5e685dacdc0144790448138af6de1dfed5954cf4dfe3",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 102.471,
+        "peak_rss_kib": 19072
+      },
+      "decode": {
+        "wall_seconds": 155.974,
+        "peak_rss_kib": 20260
+      }
+    },
+    {
+      "profile": "words",
+      "stream_bytes": 209164230,
+      "stream_sha256": "6d5f7dd2ac5ede0c46eba48b099ee4d9f405fe5519eba89a4825fe749f87dac9",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 119.693,
+        "peak_rss_kib": 23572
+      },
+      "decode": {
+        "wall_seconds": 122.873,
+        "peak_rss_kib": 24092
+      },
+      "bytes_saved_vs_previous": 10013046
+    },
+    {
+      "profile": "fields",
+      "stream_bytes": 208534385,
+      "stream_sha256": "58baf568ea6b12abffeb65185c6161c5b4117bbf177b3bf0df4a14832cc5f37d",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 113.895,
+        "peak_rss_kib": 23580
+      },
+      "decode": {
+        "wall_seconds": 137.56,
+        "peak_rss_kib": 23952
+      },
+      "bytes_saved_vs_previous": 629845
+    },
+    {
+      "profile": "templates",
+      "stream_bytes": 208362910,
+      "stream_sha256": "3247e9b9f5016132c791ffcfcfc2dd179c486014d39731080be6769317399e2a",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 130.419,
+        "peak_rss_kib": 31056
+      },
+      "decode": {
+        "wall_seconds": 125.979,
+        "peak_rss_kib": 30364
+      },
+      "bytes_saved_vs_previous": 171475
+    },
+    {
+      "profile": "topics",
+      "stream_bytes": 205874624,
+      "stream_sha256": "74e57a9951ef52e261d076e2e4cb3fcc6044b2695414454a18c7ecacb5460094",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 116.28,
+        "peak_rss_kib": 30204
+      },
+      "decode": {
+        "wall_seconds": 123.812,
+        "peak_rss_kib": 32032
+      },
+      "bytes_saved_vs_previous": 2488286
+    },
+    {
+      "profile": "titles",
+      "stream_bytes": 203506076,
+      "stream_sha256": "4e854aa70c4a0589ee7e720fa67a60f6c90f81afe13860c0093ab87d6897c914",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 140.849,
+        "peak_rss_kib": 30496
+      },
+      "decode": {
+        "wall_seconds": 146.68,
+        "peak_rss_kib": 32008
+      },
+      "bytes_saved_vs_previous": 2368548
+    },
+    {
+      "profile": "wiki",
+      "stream_bytes": 202788311,
+      "stream_sha256": "8ac8b64afab406b2acabe406c0d9b7f04f792dd18035f9a7894af92f1e6b2c86",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 133.764,
+        "peak_rss_kib": 30520
+      },
+      "decode": {
+        "wall_seconds": 112.924,
+        "peak_rss_kib": 31892
+      },
+      "bytes_saved_vs_previous": 717765
+    },
+    {
+      "profile": "experimental_link_dictionary",
+      "stream_bytes": 203266235,
+      "stream_sha256": "45485ee464613d4608716cab20924e98b04e369f7f73127c8160df763883ec72",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 113.515,
+        "peak_rss_kib": 32232
+      },
+      "decode": {
+        "wall_seconds": 122.906,
+        "peak_rss_kib": 27180
+      },
+      "bytes_saved_vs_previous": -477924
+    },
+    {
+      "profile": "experimental_lean_without_titles_or_markup_level_1",
+      "stream_bytes": 245257125,
+      "stream_sha256": "0875a0724288b3c5c499a2184ca5391a884d92b76e14a719711bc8dd6388333b",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 100.08,
+        "peak_rss_kib": 18804
+      },
+      "decode": {
+        "wall_seconds": 23.335,
+        "peak_rss_kib": 11284
+      }
+    },
+    {
+      "profile": "experimental_lean_without_titles_or_markup_level_2",
+      "stream_bytes": 238861539,
+      "stream_sha256": "a28f59ef435eaf9185bd3579b8f05ae9f1ba797ed93605d4f4e22d2b43539a59",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 223.001,
+        "peak_rss_kib": 26480
+      },
+      "decode": {
+        "wall_seconds": 26.459,
+        "peak_rss_kib": 12312
+      }
+    },
+    {
+      "profile": "experimental_lean_without_titles_or_markup_level_3",
+      "stream_bytes": 234366056,
+      "stream_sha256": "401534ab23319a58517ddc547e1081887ca95d26c88c0ddc95390e09c51d1dac",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode": {
+        "wall_seconds": 407.082,
+        "peak_rss_kib": 41840
+      },
+      "decode": {
+        "wall_seconds": 26.809,
+        "peak_rss_kib": 14360
+      }
+    }
+  ],
+  "dwx3_continuous_history_control": {
+    "raw_input_bytes": 1000000000,
+    "transformed_bytes": 720286803,
+    "blocks": 954,
+    "transformed_sha256": "5ce087b29e2ce5bf5bb6528d94d9398d80da1593b2463ef50742f801b17e6430",
+    "continuous_restored_sha256": "5ce087b29e2ce5bf5bb6528d94d9398d80da1593b2463ef50742f801b17e6430",
+    "independent_raw_lzma2_bytes": 249684076,
+    "continuous_raw_lzma2_bytes": 240740752,
+    "excluded": "XZ and DWX3 framing. The totals contain only the LZMA2 members.",
+    "dict_bytes": 1048576
+  },
+  "prior_dwx3": {
+    "stream_bytes": 249751347,
+    "archive_bytes": 249753359,
+    "encode_stream": {
+      "peak_rss_kib": 30732,
+      "wall_seconds": 339.824
+    },
+    "decode_stream": {
+      "peak_rss_kib": 16388,
+      "wall_seconds": 172.24
+    }
+  },
+  "downloads": {
+    "wiki": {
+      "file": "densewiki-v0.0.4-enwik9-wiki.zip",
+      "bytes": 202901863,
+      "sha256": "a08cf92181a8f87a8fb30bb3dcc9e47afd938ee3bff33dac65de4fac0df7574b",
+      "zip_overhead_bytes": 128
+    },
+    "lean": {
+      "file": "densewiki-v0.0.4-enwik9-lean.zip",
+      "bytes": 238629728,
+      "sha256": "7457dde99e602b01f0a7bdb0ab41ff1574512c7707b10a26e6563d8fe2f5d9b9",
+      "zip_overhead_bytes": 128
+    }
+  },
+  "validation": {
+    "fixture_profile_round_trips": 80,
+    "legacy_dwx_tests": 6,
+    "native_boundary_cases": "tools/test_native_addresses.py",
+    "native_complete_images_and_coded_payloads": "results/native-checks.json and results/native-checks-prize.json"
+  }
+}

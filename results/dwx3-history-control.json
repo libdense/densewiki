@@ -1,0 +1,11 @@
+{
+  "raw_input_bytes": 1000000000,
+  "transformed_bytes": 720286803,
+  "blocks": 954,
+  "transformed_sha256": "5ce087b29e2ce5bf5bb6528d94d9398d80da1593b2463ef50742f801b17e6430",
+  "continuous_restored_sha256": "5ce087b29e2ce5bf5bb6528d94d9398d80da1593b2463ef50742f801b17e6430",
+  "independent_raw_lzma2_bytes": 249684076,
+  "continuous_raw_lzma2_bytes": 240740752,
+  "excluded": "XZ and DWX3 framing. The totals contain only the LZMA2 members.",
+  "dict_bytes": 1048576
+}

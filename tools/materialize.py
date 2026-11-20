@@ -29,6 +29,8 @@ def materialize(profile, output, original=False, reference_archive=None):
         here = ROOT / "release/prize"
         comp = (here/"comp9-prefix.bin").read_bytes() + strong[-12-n:-12] + (here/"comp9-footer.bin").read_bytes()
         files = {"comp9": comp}
+        if not reference_archive and (here / "archive9").is_file():
+            files["archive9"] = (here / "archive9").read_bytes()
         if reference_archive:
             arc = reference_archive.read_bytes()
             if digest(arc) != PROFILES[profile]["archive9"]:

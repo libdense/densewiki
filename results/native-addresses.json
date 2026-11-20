@@ -1,0 +1,16 @@
+{
+  "flat_input_bytes": 12311,
+  "normalized_operands": 500,
+  "eligible_shapes": {
+    "direct_branch_shape": 166,
+    "modrm_shape": 334
+  },
+  "distinct_original_displacements": 494,
+  "distinct_normalized_targets": 166,
+  "v003_startup_bytes": 7597,
+  "v004_startup_bytes": 7286,
+  "v003_coded_bytes": 6841,
+  "v004_coded_bytes": 6399,
+  "release_saving_per_executable": 311,
+  "combined_native_saving_per_pair": 622
+}
