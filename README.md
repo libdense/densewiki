@@ -1,23 +1,32 @@
-# DenseWiki v0.0.1
+# DenseWiki v0.0.2
 
-DenseWiki is a lossless compression research release for the Hutter Prize's **1,000,000,000-byte enwik9**. The ZIP contains a runnable **88,983,053-byte self-extracting archive** of the corpus and its **4,057,060-byte compressor**. Both include everything they need to run on a compatible Linux host. The combined size is **93,040,113 bytes**, 142 bytes below Ryan Landay's published Ex-Girlfriend 2.0 pair. The smaller startup decoder accounts for the whole improvement.
+DenseWiki ships an **88,982,834-byte self-extracting archive** of the 1,000,000,000-byte enwik9 Wikipedia benchmark. The matching standalone compressor is **4,056,841 bytes**. The pair totals **93,039,675 bytes**, 438 bytes smaller than DenseWiki v0.0.1. All release commands take zero option bytes when invoked as the native compressor or archive.
 
-| Profile | Self-extracting archive (bytes) | Compressor (bytes) | Counted total (bytes) | Saving against its parent |
-|---|---:|---:|---:|---:|
-| Ex-Girlfriend 2.0, published | 88,983,124 | 4,057,131 | 93,040,255 | |
-| **DenseWiki size** | **88,983,053** | **4,057,060** | **93,040,113** | **142 B** |
-| cmix-neif 2.0, published | 89,346,392 | 4,042,564 | 93,388,956 | |
-| **DenseWiki prize** | **89,346,321** | **4,042,493** | **93,388,814** | **142 B** |
+| Size profile | archive9 | comp9 | Counted total |
+|---|---:|---:|---:|
+| Ex-Girlfriend 2.0 | 88,983,124 | 4,057,131 | 93,040,255 |
+| DenseWiki v0.0.1 | 88,983,053 | 4,057,060 | 93,040,113 |
+| DenseWiki v0.0.2 | **88,982,834** | **4,056,841** | **93,039,675** |
 
-All four pairs take zero option bytes. The score charges every byte of both standalone executables, including both copies of the weights. The outer distribution ZIP also contains source, experiments and validation results. All MB in the size comparisons are decimal. [Contest rules](https://hutter1.net/prize/hrules.htm) and [benchmark results](https://www.mattmahoney.net/dc/text.html).
+The startup program in each file is 219 bytes smaller. It reconstructs a 12,311-byte native loader by predicting its bytes from selected positions in recent history. Some predictors group byte values that share the same bits. Each group keeps one set of counts for predicting the next byte. The Wikipedia model and all **85,039,910 compressed Wikipedia bytes** are identical to the published parent.
 
-**Verification status.** Both candidate pairs were physically built and measured. Their executable entry points were launched on Linux. Each restored exactly the same native program image as its published parent, and the launched decoders extracted the complete expected Wikipedia bitstreams and weights. We also hashed the original 1 GB corpus. End-to-end encode, fresh decode, byte comparison, elapsed time and peak RAM for the complete model runs are available from upstream. A fresh full run of either modified pair remains outstanding. The release host had 9.73 GiB of total RAM. See `results/native-checks.json` and `upstream/ex2-verification.json`.
+A separate word-reference codec produced a smaller encoding of an 880,672-byte Wikipedia excerpt, including its own decoder. Its runnable archive used **249,424 bytes**, against **256,587 bytes** for an XZ archive carrying its decoder. The 50,051-byte profiling tail cost 1,069 bytes more with the word codec. This experiment has its own format and results. See [measurements and methods](RESEARCH.md).
 
-**Prize status as of November 19, 2026.** The official site lists 100,424,672 bytes as the awarded result, with a displayed next target below 99,420,425. Marcus Woelk's 93,388,956-byte submission is pending an award. The unrestricted size profile inherits a parent measured at 24.3 GiB and about 95 hours per direction, outside the prize limits. The prize profile starts from Woelk's original CPU design, measured by its author at 9.77 GiB and 49.18 hours for encoding and 9.75 GiB and 49.30 hours for decoding on his machine. Neither DenseWiki build has been submitted or judged. Relative to its own parent, 142 bytes is below the prize's 1% requirement. The prize profile needs another 348,560 bytes to beat the published unrestricted total of 93,040,255. [Awarded results](https://hutter1.net/prize/index.htm), [cmix-neif submission](https://github.com/marwoelk/cmix-neif-2.0), [Ex-Girlfriend release](https://github.com/rlanday/ex-girlfriend/releases/tag/v2.0).
+## Files and verification
 
-## Decode the included Wikipedia archive
+The project ZIP contains both native executables under `release/size/`, source, the complete upstream source distributions, licenses and measurements. The pair-only ZIP contains just `archive9` and `comp9`. The scored total is the sum of the two extracted file lengths.
 
-Run from the root of the unpacked ZIP. Use x86-64-v3 Linux with AVX2 and FMA. The Ryzen 5 5600X can run these binaries. For the size profile, allow 32 GiB of RAM and 30 GB of free working disk. The binaries use one CPU core and need no GPU, Python environment, model download or root installation. Use a fresh working directory. The output file is named `enwik9_uncompressed`.
+| File | SHA-256 |
+|---|---|
+| archive9 | `9c6049f0f190685dd460637c3927356b63ccf14d65fa737417cdc16bc4ba5ecd` |
+| comp9 | `6b8f2b51de02bdd5c91cf52240332f8b454d98e04798dac8c367f4706e6a3748` |
+| Expected decoded enwik9 | `159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc` |
+
+The build reconstructed both complete, hash-pinned parent files and reproduced the v0.0.1 and v0.0.2 release files byte for byte. Both v0.0.2 native entry points were exercised and their decoded program images and extracted inputs were compared. A fresh full billion-byte model run is outstanding for v0.0.2. The upstream full encode and fresh decode took about 95 hours each and used about 24.3 GiB of RAM. The CPU-only size profile exceeds the upstream prize-track resource envelope. The retained `prize` profile and its manifests correspond to v0.0.1. [Native checks](results/native-checks.json) and [upstream full run](upstream/ex2-verification.json).
+
+## Decode the included archive
+
+Use x86-64-v3 Linux with AVX2 and FMA. Allow about 32 GiB of RAM and 30 GB of free working disk. From the project root, use a fresh directory. The native entry points create working files relative to their current directory.
 
 ```bash
 sha256sum -c SHA256SUMS
@@ -31,34 +40,42 @@ cp release/size/archive9 ../densewiki-decode/
 )
 ```
 
-For a raw source file, extract the official `enwik9.zip`. It contains the first billion bytes of the March 2006 English Wikipedia XML dump. [Canonical dataset and downloads](https://www.mattmahoney.net/dc/textdata.html).
-
-## Encode and independently verify
+## Encode and verify on the original corpus
 
 ```bash
-python3 tools/roundtrip.py prize /absolute/path/to/enwik9 ../densewiki-prize-run
+python3 tools/roundtrip.py size /absolute/path/to/enwik9 ../densewiki-002-run
 ```
 
-The runner requires Python 3.11+ on Linux. It hashes the input, pins the native process to one permitted logical CPU, runs the no-argument encoder, checks the expected archive size and SHA-256, then starts that archive in a fresh directory. It hashes and byte-compares the output to the input. The two phase logs and a final `verified.json` go into the chosen run directory. An interrupted run can be restarted with the same command and `--resume`. Completed phases are revalidated, and an interrupted phase starts from its beginning. Its process-tree RSS counter samples once per second. Official judging has its own resource measurement.
+This runner checks the input hash, pins the encode and decode to one allowed CPU, checks the generated archive against v0.0.2, and byte-compares the fresh decoder output with the input. Completed stages can be reused with `--resume`. The result is `verified.json`. The source corpus is the first billion bytes of the March 2006 English Wikipedia dump. [Canonical dataset](https://www.mattmahoney.net/dc/textdata.html).
 
-Choose `size` in place of `prize` to run the smaller archive's model. The size pair is in `release/size/`. The prize encoder can also be rebuilt directly from the bundled bytes as follows.
+## Rebuild from the included bytes
 
 ```bash
-python3 tools/materialize.py prize ../prize-bin
+python3 tools/materialize.py size ../densewiki-original --original
+python3 tools/build.py size ../densewiki-original ../densewiki-rebuilt
+cmp release/size/archive9 ../densewiki-rebuilt/archive9
+cmp release/size/comp9 ../densewiki-rebuilt/comp9
+python3 tools/verify_layers.py ../densewiki-native-checks.json
 ```
 
-Place this `comp9` beside the original file named `enwik9` and run `./comp9`. It writes the self-extracting `archive9`. The ZIP ships the complete size archive and one shared copy of the weights needed to reconstruct the alternative encoder. To obtain the prize archive immediately from an existing copy of Woelk's published archive, add `--reference-archive /path/to/original/cmix-neif-2.0/archive9` to the materialize command and choose a fresh output directory. The tool checks both upstream and generated hashes. [Woelk's original binary files](https://marwoelk.de/cmix-neif-2.0/).
+Release reconstruction uses Python 3.11+ with the tarfile data filter, GCC 14.2.0 and GNU ld 2.44 on x86-64 Linux. The build checks the original compressed startup, encodes the selected policy, decodes the result independently, and checks the final linked bytes. Other toolchains can emit different executable lengths. Use `tools/materialize.py prize NEW_DIRECTORY` to recover the retained alternative encoder. The original prize archive can be supplied using `--reference-archive`.
 
-## Inspect or rebuild the released change
+## Restore the included word-codec example
 
 ```bash
-python3 tools/materialize.py size ../ex2-original --original
-python3 tools/build.py size ../ex2-original ../size-rebuilt
-cmp release/size/comp9 ../size-rebuilt/comp9
-cmp release/size/archive9 ../size-rebuilt/archive9
-python3 tools/check_core.py size ../ex2-original ../size-rebuilt
+python3 -I release/word-pilot/wiki-excerpt.pyz ../wiki-excerpt.bin
 ```
 
-This rebuild decodes the original calibration image, reproduces its original stream, encodes the same image with the selected policy, checks it with a separate decoder, and links the native startup program. It charges the complete linked image. The exact release was built with Debian GCC 14.2.0 and GNU ld 2.44. Different toolchains can change the executable length. The same sequence accepts `prize` and its original encoder with optional matching archive. On either profile, `tools/check_startup.py PAIR /path/to/enwik9 encode` or `decode` runs the actual executable and verifies its extracted components before deliberately stopping it.
+The output is the 880,672-byte excerpt. Its reference bytes and SHA-256 are identified in `results/wiki-words.json`.
 
-Both complete upstream source distributions, training code, weights and original notices are in `upstream/sources.tar.xz`. For example, `python3 tools/prepare_experiment.py size-original ../ex2-source` extracts the original tree. Its `README.md` and build scripts specify the upstream LLVM 18.1.3 and GCC 13.3 support files for a byte-identical base on Ubuntu. The source extractor uses Python 3.12 or Python 3.11 with the tarfile data-filter backport. See [research, experiments and attribution](RESEARCH.md) for the actual cache patches, model search and evidence.
+## Run the word codec on a Wikipedia dump
+
+```bash
+python3 experiments/wiki-words/full_corpus.py /absolute/path/to/enwik9 ../densewiki-word-test
+```
+
+The benchmark writes a continuous XZ archive, a blocked XZ control, a vocabulary-coded archive, and a JSON receipt. It compares every recovered byte from each archive to the original. It streams the input in 1 MiB blocks for the vocabulary experiment and uses Python's standard library. The native size profile and this text benchmark can run independently.
+
+## Attribution
+
+DenseWiki extends the Ex-Girlfriend 2.0 release by Ryan Landay, based on Marcus Woelk's cmix-neif 2.0. The upstream notices identify the earlier cmix, transformer, BITLSTM and training contributors. DenseWiki modifications use GPL-3.0-only. Wikipedia content retains its original contributor attribution and licensing. The upstream source, training code, notices and applicable license texts are included. [Upstream notices](upstream/EX2-NOTICE.md), [training attribution](upstream/TRAINING-ATTRIBUTION.md), [v0.0.1 history](HISTORY-v0.0.1.md).

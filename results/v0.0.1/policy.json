@@ -1,0 +1,37 @@
+{
+  "masks": [
+    1,
+    2,
+    3,
+    4,
+    0,
+    17,
+    6,
+    5,
+    9
+  ],
+  "region_shift": 31,
+  "bit_shift": 3,
+  "prior": 16,
+  "dynamics": [
+    63,
+    2,
+    2,
+    1
+  ],
+  "branches": false,
+  "weights": [
+    [
+      14,
+      8,
+      27,
+      6,
+      4,
+      21,
+      14,
+      17,
+      18
+    ]
+  ],
+  "optimization": "-Os"
+}

@@ -1,0 +1,130 @@
+{
+  "wiki-prefix": {
+    "input_bytes": 880672,
+    "input_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+    "profiles": {
+      "xz": {
+        "stream_bytes": 256204,
+        "runnable_bytes": 256587,
+        "sha256": "ae38595ba5f7127093df8b250dc5f000dd239fa444c73d878c514a183b3b1966",
+        "runnable_sha256": "7412e1535bbeff3c6cfe09e26e78439c4b8c2efb46642e03b6d248cd5477dc24",
+        "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+        "byte_comparison": "equal"
+      },
+      "raw": {
+        "stream_bytes": 256222,
+        "runnable_bytes": 257672,
+        "sha256": "e4a6580567ee8b65aa29ed889674b227e3336ceb815e0de6330c1dcead89bd2d",
+        "runnable_sha256": "1535b89e0cafe933bc11072579de97e4f82730fd9f4d44f2a51dfda2c44838ec",
+        "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+        "byte_comparison": "equal",
+        "raw_blocks": 1,
+        "dictionary_blocks": 0
+      },
+      "frequency": {
+        "stream_bytes": 249370,
+        "runnable_bytes": 250820,
+        "sha256": "e6833822ff69f119ea317562c093f0b344741fb82293e148eb9ddddcb3104344",
+        "runnable_sha256": "49ece5faf0a97fa9c702b272607784af209620e9bfc51c603e1fb52bb0e40beb",
+        "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      },
+      "predecessor": {
+        "stream_bytes": 249302,
+        "runnable_bytes": 250752,
+        "sha256": "3122e17206908c9fc8836d7971e0452621cbe8b2ffd1bacc05edce604b76af8c",
+        "runnable_sha256": "6ae36710e42a7a736648af8075adb2d41713abd6f5a3de17e504ff52c43fdcf9",
+        "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      },
+      "lexical": {
+        "stream_bytes": 247974,
+        "runnable_bytes": 249424,
+        "sha256": "bf6d3a8eed8f07f0cfef3ee3a19a0a049862d77cdb8d9aa23a0836a0d4c09c43",
+        "runnable_sha256": "9fe18b2bb4d07436f8047ec0853beb5ca43c48f6d510151f2877915db70c57f1",
+        "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      },
+      "auto": {
+        "stream_bytes": 247974,
+        "runnable_bytes": 249424,
+        "sha256": "bf6d3a8eed8f07f0cfef3ee3a19a0a049862d77cdb8d9aa23a0836a0d4c09c43",
+        "runnable_sha256": "9fe18b2bb4d07436f8047ec0853beb5ca43c48f6d510151f2877915db70c57f1",
+        "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      }
+    }
+  },
+  "profiling-tail": {
+    "input_bytes": 50051,
+    "input_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+    "profiles": {
+      "xz": {
+        "stream_bytes": 8348,
+        "runnable_bytes": 8731,
+        "sha256": "c0b7f184ab8795204935719e209857ddb7e7dab9541b186d2a0640ff89079535",
+        "runnable_sha256": "87e9a0fc2c5d532f7919c12b3b28af1d2d77c1c257290ceadba0a761a5d4359c",
+        "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+        "byte_comparison": "equal"
+      },
+      "raw": {
+        "stream_bytes": 8366,
+        "runnable_bytes": 9816,
+        "sha256": "6e6f2442d6f65ce26a243082f151c649a71deb4244e582cc5065a457e9a56ca1",
+        "runnable_sha256": "fe108671770cfe48305f036b03b6caf4cd36e6a8b9d0f645a0e79431607e3af6",
+        "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+        "byte_comparison": "equal",
+        "raw_blocks": 1,
+        "dictionary_blocks": 0
+      },
+      "frequency": {
+        "stream_bytes": 8358,
+        "runnable_bytes": 9808,
+        "sha256": "20897f1402d9c0f38f2dfa1efc1eee0cbdf5d74c5b3bef1d75b08fbcd689339c",
+        "runnable_sha256": "4bf10abc8affea727eba749b2e3e568f63ab4f834f865e4ec2451ab2921ccb79",
+        "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      },
+      "predecessor": {
+        "stream_bytes": 8362,
+        "runnable_bytes": 9812,
+        "sha256": "224d3d94f9925019403dfd72abbf636525b8e932c2337a04840b74af2ca544ab",
+        "runnable_sha256": "e6f1e9abfd86645b905a0ebcf8f195cf03dbcfc59d6f31e82bd889a902b885fc",
+        "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      },
+      "lexical": {
+        "stream_bytes": 8350,
+        "runnable_bytes": 9800,
+        "sha256": "b656490439b33395ea7de829877f98d61b99c1b06910a7e543d5c99c9f2e3691",
+        "runnable_sha256": "d0450c8d1c61801b8894b918919a22c3cfc7f53afc02d877b3519e652b486903",
+        "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      },
+      "auto": {
+        "stream_bytes": 8350,
+        "runnable_bytes": 9800,
+        "sha256": "b656490439b33395ea7de829877f98d61b99c1b06910a7e543d5c99c9f2e3691",
+        "runnable_sha256": "d0450c8d1c61801b8894b918919a22c3cfc7f53afc02d877b3519e652b486903",
+        "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+        "byte_comparison": "equal",
+        "raw_blocks": 0,
+        "dictionary_blocks": 1
+      }
+    }
+  }
+}

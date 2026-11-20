@@ -1,82 +1,73 @@
-# Measurements and experimental source
+# DenseWiki v0.0.2 measurements
 
-## The comparison that determined the target
+## What changed in the released pair
 
-The supplied Tufazip v2 decoder lists a 100,958,324-byte coded file. Its 4,430,029-byte decoder package brings the Large Text Compression Benchmark total to 105,388,353 bytes. Its published run used two NVIDIA B200 GPUs. The November 19 benchmark ranks Ex-Girlfriend 2.0 first with an 88,983,124-byte self-extracting archive. Adding its standalone compressor for the Hutter comparison gives 93,040,255 bytes. That was the reference to beat. The Hutter score for a self-extractor is the compressor plus the archive plus any required option bytes. LTCB charges a self-extractor only once. [Benchmark and methods](https://www.mattmahoney.net/dc/text.html), [official rules](https://hutter1.net/prize/hrules.htm).
-
-Ryan Landay's Ex-Girlfriend 2.0 extends Marcus Woelk's cmix-neif 2.0. It widens retrieval, adds two more semantic caches keyed on layer 12 and a different sketch seed, spreads online fast-weight updates over transformer blocks 4 through 15, and carries BITLSTM state across windows. The trained weights come from Woelk, who continued training from Vladimir Malinovskii's cmix-neif-beehive weights. Vladimir Ivanov supplied the earlier transformer framework. David Freelan's cmix-obias contributed the BITLSTM method. The training attribution specifically identifies the byte vocabulary, enwik9 training data, format lineage and separate terms for Wikipedia excerpts. We verified that the attribution at the requested main-branch link matched the copy in the v2.0 source tar. SHA-256 is `c4313830fbc0e4a6f6f6e1a5c61c14323e61a18b04148049bee394ae4757e808`. [Training attribution](https://github.com/rlanday/ex-girlfriend/blob/main/training/ATTRIBUTION.md), [tagged source](https://github.com/rlanday/ex-girlfriend/tree/v2.0), [full-run evidence](https://github.com/rlanday/ex-girlfriend/releases/tag/v2.0).
-
-## Where 142 bytes went
-
-Both released entries use the same 12,311-byte startup image. DenseWiki fits a new causal integer-count mixture to this executable data. The Wikipedia bitstream stays byte-identical to its parent. Every observed bit updates the selected contexts once. Candidate weight vectors reuse the same observed count trace. The native decoder and model constants are part of each scored executable, so selection minimizes actual linked bytes.
-
-| Component in each executable | Original | DenseWiki | Bytes saved |
+| Bytes in each startup | v0.0.1 | v0.0.2 | Difference |
 |---|---:|---:|---:|
-| Coded startup image | 7,162 | 7,110 | 52 |
-| Headers, constants and startup code | 757 | 738 | 19 |
-| Complete startup block | 7,919 | 7,848 | 71 |
+| Range-coded startup image | 7,110 | 6,841 | -269 |
+| ELF, decoder code and model tables | 738 | 788 | +50 |
+| Complete linked startup | 7,848 | 7,629 | **-219** |
 
-The search evaluated 100 mixtures over context masks and byte/bit groups, 300 counter/branch-transform settings, and 144 fitted variants of the best settings. We linked each of these 544 choices with both `-Os` and `-Oz`. A single bank of nine weights won. The smallest coded stream alone did not select the smallest executable. Its complete ranking and winner are in `results/model-search.tsv` and `results/policy.json`. This is fitting fixed bytes that the decoder is required to carry. Its generalization to other executable images has not been measured.
+Both native files carry a copy. The combined score drops by **438 bytes** from v0.0.1 and **580 bytes** from Ex-Girlfriend 2.0. The self-extracting archive singly drops by 219 and 290 bytes against those respective releases. The upstream 3,744,629-byte transformer container, the 85,039,910-byte Wikipedia stream and the eight-byte archive trailer are preserved in full.
 
-To replay the search, use Python with NumPy and SciPy (the release used 2.3.5 and 1.17.0 respectively), GCC and GNU ld on x86-64 Linux. Run from the release root and supply new trial directories. Release artifact reconstruction with the chosen policy uses only Python's standard library and the C toolchain.
+## Selecting context from the topology of recent bytes
 
-```bash
-cc -O3 -std=c11 src/mix.c -o ../densewiki-mix
-python3 tools/fit.py ../densewiki-mix experiments/startup.bin ../dw-mixtures
-python3 tools/tune.py ../densewiki-mix experiments/startup.bin ../dw-counters
-python3 tools/select_policy.py ../dw-mixtures ../dw-counters ../dw-selection
-cmp results/model-search.tsv ../dw-selection/model-search.tsv
-```
+The book's chapters 38 and 43 describe building shared state once for recipients that need the same information. libdense 0.4.8.2's factored-workset notes describe representing a shared base with private differences. The experimental libdense_topo 0.2.0 module represents lattice neighborhoods using a list of offsets. DenseWiki applies these ideas to a sequence. An offset selects an earlier byte. A second mask selects the bits of that byte that a predictor can see. Histories that agree on the selected information contribute observations to the same group.
 
-For both profiles we compared every byte beyond the changed startup block with the published files. The generated archive prefix is exactly the decoder prefix emitted by the candidate compressor. Each candidate was run and its actual unpacked native image compared in full with its parent's unpacked image. The short, variable trailer was separately checked to contain the correct path to the launched executable. Its encoder and decoder start from these same respective native images. The size profile retains all 85,039,910 coded Wikipedia bytes, the 3,744,629-byte weights and the original eight-byte trailer. The prize profile retains its own 85,417,870-byte stream. Each upstream model's published full run remains the source for the end-to-end result. `tools/roundtrip.py` produces independent candidate evidence when run to completion.
+For example, the chosen policy includes both the most recent byte as an exact value and the same byte masked with `0xfc`. Values `0x48` and `0x49` contribute to the same coarse group but different exact groups. Another predictor uses the low three bits of that byte. At each byte position, the decoder looks up each selected group's tree once. It then walks the tree for the eight successive bits. The encoder and decoder learn from previously restored bytes in the same order.
 
-## Storing a semantic sketch once
+The winner uses 24 stencils, a 20-bit hashed tree index and one bank of integer mixture weights. The count arena reserves 512 MiB of virtual address space at startup. The process touches entries on demand. Upstream model-run memory remains a separate measurement. The v0.0.11 skills package's bounded hash-search and histogram examples informed the implementation and tests. The shipped native program has no dependency on libdense.
 
-The source's semantic cache inserts each key into 16 hash tables. The same 96-bit sketch was written into every bucket alongside a 32-bit insertion ID. Chapters 38 and 43 of the supplied dense-region MMO book describe producing one shared representation when the same payload has many recipients. Here the recipients are index buckets. DenseWiki stores the sketch once in two packed planes indexed by the key's ring slot. The buckets store only insertion IDs. The search still checks expired and too-recent IDs before reading the shared sketch, and preserves bucket order and first-minimum eviction ties. More indirect reads may cost CPU time.
+| Model selection stage | Best complete startup |
+|---|---:|
+| Released v0.0.1 | 7,848 B |
+| Best v0.0.2 search using whole prior bytes | 7,715 B |
+| Best search allowing coarse byte classes | 7,640 B |
+| Refit using counts observed in the deployed hash table | **7,629 B** |
 
-| Experimental arm | Entries/bucket | Original affected bytes | New affected bytes | Difference |
-|---|---:|---:|---:|---:|
-| `size-shared`, per cache | 63 | 4,227,858,432 | 1,459,617,792 | 2,768,240,640 fewer |
-| `size-shared`, all three caches | 63 | 12,683,575,296 | 4,378,853,376 | 8,304,721,920 fewer |
-| `prize-shared`, one cache | 15 | 1,006,632,960 | 452,984,832 | 553,648,128 fewer |
-| `prize-47`, one cache | 47 vs. 15 | 1,006,632,960 | 989,855,744 | 16,777,216 fewer |
-
-These are exact byte counts for the index and sketch storage at production dimensions. They exclude keys, model state, candidate buffers, page rounding and allocator overhead. Neither total process RSS nor remaining prize headroom can be read from this table. The two equal-width arms aim to preserve every prediction. The wider prize arm can select additional neighbors and **requires a fresh encode** before it has a compression score.
-
-We compiled the patched upstream predictor translation unit for both baselines and for the 47-entry variant. The differential harness processed every byte of the canonical 1 GB file in 244,141 consecutive 4,096-byte blocks. It derives synthetic 96-bit sketches from those blocks and uses a smaller ring to force expiry, overwrite, collisions, ties and repeated selections. It compares IDs and ordered Hamming distances to the original 16-byte slot representation. It passed 8,189,212 distance comparisons at width 63, 5,982,273 at width 15 and 7,456,253 at width 47. The width-47 oracle also used width 47. These runs exercise the storage algorithm with corpus-derived data. Full transformer traces, production peak RAM, runtime, and complete candidate archive sizes are outstanding for all three experiments. None of these arms is enabled in either measured binary.
+The first search trained whole-byte stencils over all 256 subsets of the previous eight bytes. It considered independent contexts and the original hash layout as controls. The second search introduced byte classes, including 12 coarser masks over short stencils, and ranked each feature by the change in log loss when it was removed. These searches used the fixed 12,311-byte startup image. The table compares the best complete linked solution at each stage. It measures this particular image. The selection made 416 linked comparisons, then 100 more for the final weight refit. Every table byte and the complete native decoder were charged. The measured tables include compiler ties.
 
 ```bash
-python3 tools/prepare_experiment.py prize-47 ../dw-prize47-src
-mkdir ../dw-prize47-build
-(cd ../dw-prize47-build && bash ../dw-prize47-src/build.sh)
-python3 tools/roundtrip.py prize /absolute/path/to/enwik9 ../dw-prize47-run --encoder ../dw-prize47-build/comp9
+python3 experiments/context-stencils/fit.py ../octets.json
+python3 experiments/context-stencils/byte_classes.py ../classes.json
+python3 experiments/context-stencils/select.py ../octets.json ../selected --add ../classes.json
+python3 experiments/context-stencils/refine.py ../selected/policy.json ../refitted
+cmp results/policy.json ../refitted/policy.json
 ```
 
-Use the upstream build environment documented in the extracted tree for this production build. It uses the upstream startup packer. Report the archive and its actual built encoder together. Only compare the full pair after the fresh output matches the canonical input. For the isolated storage check, the release root is sufficient.
+The training runs used GCC 14.2.0, Python 3.12.14, NumPy 2.3.5 and SciPy 1.17.0. The archived candidate sets can be passed directly to `select.py` to repeat linking without refitting them. [Octet candidates](results/stencil-octets.json), [class candidates](results/stencil-classes.json), [linked candidates](results/stencil-search.tsv), [refit](results/stencil-refit.tsv), [release policy](results/policy.json).
+
+## A separate test on Wikipedia text
+
+The word codec counts exact, case-sensitive ASCII words 3 to 64 bytes long in each 1 MiB block. A word is eligible when `(occurrences - 1) * (length - 2) > 32`. Each selected spelling appears once in the transmitted dictionary. The 96 most frequent words get one-byte references. Sorting common and remaining words lexically within their two tiers helps XZ compress the dictionary. The format escapes literal high bytes, preserves markup and punctuation, and chooses the smaller of a raw and transformed block in automatic mode. The decoder needs no outside vocabulary, normalization rules or network access.
+
+The upstream training attribution identifies the profiling material as enwik9 excerpts. The upstream profiling file `input2` ends with the entire 50,051-byte file `input`. Removing that overlap leaves an 880,672-byte Wikipedia excerpt. The tail includes markup excerpts and an appended byte sequence. The two test inputs have disjoint positions in the fixture. The vocabulary threshold and layouts were explored on this material, so this is an in-sample result.
+
+| Input | Continuous XZ stream | DWX2 auto stream | XZ with decoder | DWX2 with decoder | Runnable saving |
+|---|---:|---:|---:|---:|---:|
+| Wikipedia excerpt, 880,672 B | 256,204 | 247,974 | 256,587 | 249,424 | **7,163 B (2.79%)** |
+| Profiling tail, 50,051 B | 8,348 | 8,350 | 8,731 | 9,800 | **-1,069 B** |
+
+Runnable totals are measured Python ZIP applications with their respective decoder source and payload. Both use the installed Python runtime and its XZ implementation. The larger winning archive is included under `release/word-pilot/`. Each application ran in a fresh Python process and recreated the exact source bytes. The continuous XZ control has its own smaller decoder. A separate control holds the DWX2 decoder and framing fixed.
+
+| Ordering / control on the 880,672-byte excerpt | Complete DWX2 stream |
+|---|---:|
+| Raw bytes, same block format | 256,222 B |
+| Word references assigned by frequency | 249,370 B |
+| Group words by their most frequent selected predecessor within each price tier | 249,302 B |
+| Sort words lexically within each price tier | **247,974 B** |
+
+The predecessor experiment instantiates a directed word co-occurrence graph. It saves 68 bytes against frequency order on this excerpt. Lexical order saves another 1,328 bytes. All three serialize the dictionary in full. These numbers apply to the XZ-based experiment. The enwik9 production bitstream still uses the upstream Wikipedia model.
 
 ```bash
-g++ -std=c++17 -O2 -DDENSEWIKI_TEST_WIDTH=47 experiments/shared-sketch/replay.cpp -o ../dw-replay
-../dw-replay /absolute/path/to/enwik9
+python3 tools/prepare_experiment.py size-original ../size-source
+python3 experiments/wiki-words/test_codec.py
+python3 experiments/wiki-words/benchmark.py ../size-source ../wiki-words.json
+cmp results/wiki-words.json ../wiki-words.json
 ```
 
-## Evidence from the other supplied work
+The JSON includes SHA-256 hashes for both distinct inputs, every stream, every runnable archive and every restored output. Python and zlib versions can affect the ZIP packaging of decoder source. [Excerpt results](results/wiki-words.json).
 
-| Input | How it affected this release |
-|---|---|
-| Plausible C11 codec | Built and round-tripped three cold 1 MB samples from the corpus and from the coded payload. The raw samples became 252,437, 111,876 and 152,099 bytes. All three previously coded samples grew above 1,002,000 bytes. |
-| Babelsuite v0.0.2 | Its address-length accounting motivates charging an address, recipe and decoder together. A full-payload control found 7.99999785 bits per byte of empirical zero-order entropy. zlib level 9 expanded that stream by 25,951 bytes. The result applies to this control. |
-| DSO v0.0.9 and Eclipse v0.0.61 | Adopted DSO's idea of evaluating candidate changes against an explicit cost, and Eclipse's discipline of testing the exact domain of a claim. Here the cost is the linked executable plus archive. Runtime identity, table allocation and final restored data each have their own checks. |
-| Lithify v0.0.43 and Murmuration v0.0.16 | Separate the choice of neighbors from the cost of retrieving them. The equal-width representation and the 47-entry retrieval experiment can be compared independently. |
-| Dense-weights and the two handoffs | The Lithify archive already contains dense-weights v0.0.26. Its G010 evidence gives equal next-token winners at 74/74 positions but exact visible vectors at 60/74. A range coder needs the same discrete interval at both ends on every bit. Those figures alone cannot establish that condition. The separate 300 MB package was unnecessary for v0.0.1. |
-| OPSD paper and code | Student versus self-teacher accuracy is a candidate-ranking signal. A coding experiment would need a teacher available from the decoded prefix or a small transmitted student, and must measure true-symbol log loss and final bytes. This release charges no projected teacher gain. |
-| Tufazip v2 | Provides a GPU-based external comparison and a reproducible decoder specification. The two released profiles run on CPU. |
+## Verification limits
 
-The full zlib and Plausible controls with offsets and hashes are in `results/payload-probe.json`. `tools/payload_probe.py` reproduces them using the original size reference archive and an optional Plausible executable compiled from the supplied project.
-
-## Source and data notices
-
-The DenseWiki code and modifications are distributed under GPL-3.0-only. The upstream packages retain their authors, notices and third-party licenses. Original code, training sources, weights, profile input, build scripts and their notices are included in full in `upstream/sources.tar.xz`. The compressor descends from Byron Knoll's cmix and the projects credited in `upstream/EX2-NOTICE.md`. The book, private DSO kit, dense-weights and other user projects were research inputs. Their source packages are not redistributed here.
-
-The compressed enwik9 text is by Wikipedia contributors. Its source is the English Wikipedia dump dated March 3, 2006. The upstream training attribution records GFDL / CC-BY-SA for the Wikipedia excerpts included with its source. Article titles and revision IDs in the restored XML identify their sources. Contributors can be found through each article's page history at `https://en.wikipedia.org/w/index.php?title=ARTICLE_TITLE&action=history`. Copies of the GNU Free Documentation License and CC BY-SA 4.0 are included under `upstream/`. [Dataset and original dump information](https://www.mattmahoney.net/dc/textdata.html), [Wikipedia copyright information](https://en.wikipedia.org/wiki/Wikipedia:Copyrights), [upstream attribution](https://github.com/rlanday/ex-girlfriend/blob/main/training/ATTRIBUTION.md).
-
-`upstream/sources.tar.xz` contains the exact decompressed source tars of the two public releases, compressed together for distribution. Their published gzip SHA-256 hashes are `ef635459bba7a19b9582266d4b5a20451798891aa631a5e78b388fe93b1aedfa` (Ex-Girlfriend) and `62da32b97f9909ce5f2d4988a84e1b9cfbff4c9947538cbc6659a2915b024874` (cmix-neif). The source extraction tool verifies the decompressed tar digests. DenseWiki's original changes are in `src/`, `tools/` and `experiments/shared-sketch/`. [Ex-Girlfriend release](https://github.com/rlanday/ex-girlfriend/releases/tag/v2.0), [cmix-neif release](https://marwoelk.de/cmix-neif-2.0/).
+The build's reference conversion, offline coder/decoder, capture of unpacked native images, native emission of the decoder prefix, and extraction of the weights and entire Wikipedia bitstream each have a byte-identity check. The reference compressor and archive can be reconstructed in full from the shipped package. A fresh end-to-end decode of all one billion corpus bytes under v0.0.2 is outstanding. A bounded attempt to start the parent model on the 9.7 GiB release host reached model initialization and was terminated before the first buffered model-output block. Upstream's independent full-run receipt reports a byte comparison against canonical enwik9 and about 24.3 GiB peak RAM. The next direct test of the word codec is the full-corpus three-way comparison implemented in `experiments/wiki-words/full_corpus.py`. [Candidate native checks](results/native-checks.json), [size report](results/size.json), [upstream full-run receipt](upstream/ex2-verification.json).

@@ -38,8 +38,15 @@ def encode_policy(p):
     cap, boost, decay, keep = p.get("dynamics", [255, 2, 1, 1])
     if not (1 <= cap <= 255 and 1 <= boost <= 32 and 1 <= decay <= 4 and keep in (0, 1)):
         raise ValueError("invalid counter dynamics")
-    return b"DWM2" + bytes([m, p["region_shift"], p["bit_shift"], p["prior"], cap, boost, decay, keep] + p["masks"] +
-                           [x for bank in p["weights"] for x in bank])
+    tree_bits = p.get("tree_bits", 0)
+    if tree_bits not in (0, 16, 18, 20) or (tree_bits and p.get("exact")):
+        raise ValueError("invalid context tree layout")
+    classes = p.get("classes", [])
+    if classes and (not tree_bits or len(classes) != m or any(c < 1 or c > 255 for c in classes)):
+        raise ValueError("invalid byte-class masks")
+    magic = b"DWC" + bytes([tree_bits]) if classes else b"DWT" + bytes([tree_bits]) if tree_bits else (b"DWM3" if p.get("exact") else b"DWM2")
+    return magic + bytes([m, p["region_shift"], p["bit_shift"], p["prior"], cap, boost, decay, keep] + p["masks"] +
+                           [x for bank in p["weights"] for x in bank] + classes)
 
 
 def linked_image(p, coded, cwd):
@@ -50,8 +57,16 @@ def linked_image(p, coded, cwd):
     weights = [x for bank in p["weights"] for x in bank]
     bits = 8 >> p["bit_shift"]
     cap, boost, decay, keep = p.get("dynamics", [255, 2, 1, 1])
-    macros = {"DW_BOOST": boost, "DW_DECAY": decay, "DW_KEEP": keep, "DW_BRANCHES": int(p.get("branches", False)),
-              "BOOT_NM": len(masks), "BOOT_TB": 22, "BOOT_SHIFT": 42, "BOOT_TSZ": 8388608,
+    # Exact directories hold at most one new context per stencil per byte.
+    exact = bool(p.get("exact"))
+    directory_bytes = len(masks) * 32768 * 16
+    count_bytes = (1 + len(masks) * FLAT_SIZE) * 512
+    tree_bits = p.get("tree_bits", 0)
+    table_bytes = directory_bytes + count_bytes if exact else (512 << tree_bits if tree_bits else 8388608)
+    narrow = tree_bits and max(sum(bank) for bank in p["weights"]) * cap * boost + p["prior"] < (1 << 20)
+    macros = {"DW_NARROW": int(bool(narrow)), "DW_CLASSES": int(bool(p.get("classes"))), "DW_CLASS_LIST": ",".join(map(str, p.get("classes", []))),
+              "DW_TREE_BITS": tree_bits, "DW_EXACT": int(exact), "DW_BOOST": boost, "DW_DECAY": decay, "DW_KEEP": keep, "DW_BRANCHES": int(p.get("branches", False)),
+              "BOOT_NM": len(masks), "BOOT_TB": 22, "BOOT_SHIFT": 42, "BOOT_TSZ": table_bytes,
               "BOOT_EPS": p["prior"], "BOOT_CAP": cap, "DW_REGION_SHIFT": p["region_shift"],
               "DW_BIT_SHIFT": p["bit_shift"], "DW_BIT_GROUPS": bits,
               "DW_BIT_GROUP_LOG2": 3 - p["bit_shift"], "DW_REGIONS": len(p["weights"]) // bits,
@@ -75,7 +90,8 @@ def linked_image(p, coded, cwd):
     if (typ != 1 or flags != 7 or offset or vaddr != 0x400000 or file_size != mem_size or
         file_size > len(elf) or elf[file_size-len(coded):file_size] != coded):
         raise ValueError("linked data differs from the checked coder stream")
-    if elf[144:144 + len(masks) + len(weights)] != bytes(masks + weights):
+    model_bytes = bytes(masks + weights + p.get("classes", []))
+    if elf[144:144 + len(model_bytes)] != model_bytes:
         raise ValueError("linked model table mismatch")
     # Strip link-time sections exactly as the upstream release build does.
     elf[40:48] = bytes(8)
@@ -130,7 +146,8 @@ def build(args):
     inputs = {"comp9": checked_input(source, "comp9", args.profile)}
     if (source / "archive9").exists():
         inputs["archive9"] = checked_input(source, "archive9", args.profile)
-    policy = json.loads(args.policy.read_text())
+    policy_path = args.policy or ROOT / ("results/policy.json" if args.profile == "size" else "results/v0.0.1/policy.json")
+    policy = json.loads(policy_path.read_text())
     with tempfile.TemporaryDirectory() as scratch, tempfile.TemporaryDirectory(dir=destination.parent) as staging:
         temp, stage = Path(scratch), Path(staging) / "publish"
         stage.mkdir()
@@ -184,5 +201,5 @@ if __name__ == "__main__":
     parser.add_argument("profile", choices=PROFILES)
     parser.add_argument("upstream", type=Path, help="directory with published comp9 and optional archive9")
     parser.add_argument("output", type=Path, help="new output directory")
-    parser.add_argument("--policy", type=Path, default=ROOT / "results/policy.json")
+    parser.add_argument("--policy", type=Path, help="override the release policy for this profile")
     build(parser.parse_args())

@@ -61,9 +61,11 @@ def check(directory, wiki, mode):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path, help="contains both candidate files")
-    parser.add_argument("enwik9", type=Path)
+    parser.add_argument("enwik9", nargs="?", type=Path, help="canonical input, required for encode")
     parser.add_argument("mode", choices=["encode","decode"])
     args = parser.parse_args()
-    if file_hash(args.enwik9) != CANONICAL:
+    if args.mode == "encode" and args.enwik9 is None:
+        parser.error("encode requires a path to enwik9")
+    if args.enwik9 is not None and file_hash(args.enwik9) != CANONICAL:
         raise ValueError("input must be original enwik9")
-    print(json.dumps(check(args.directory.resolve(), args.enwik9.resolve(), args.mode),indent=2))
+    print(json.dumps(check(args.directory.resolve(), args.enwik9.resolve() if args.enwik9 else None, args.mode), indent=2))

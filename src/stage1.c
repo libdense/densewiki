@@ -2,6 +2,7 @@
  * Derived from Marcus Woelk's cmix-neif 2.0 stub_boot.c.
  * DenseWiki changes, 2026-11-19. The freestanding C decoder mixes integer
  * context counts and adapts them with the parameters selected offline.
+ * The v0.0.2 layout reuses each history lookup across all eight bit decisions.
  * One loadable ELF segment contains the six-word upstream header at offset
  * 120, the model table, the startup code and the range-coded second stage.
  * The Linux entry code maps the original image and the count table, restores
@@ -24,7 +25,12 @@ volatile struct __attribute__((packed)) {
 
 /* Each mask is followed in the table by its bank's weights at a fixed offset. */
 __attribute__((used, aligned(1), section(".cutmodels")))
-const unsigned char cut_models[(1 + DW_BANKS) * BOOT_NM] = { BOOT_MASK_LIST, BOOT_WT_LIST };
+const unsigned char cut_models[(1 + DW_BANKS + DW_CLASSES) * BOOT_NM] = {
+    BOOT_MASK_LIST, BOOT_WT_LIST
+#if DW_CLASSES
+    , DW_CLASS_LIST
+#endif
+};
 
 __asm__(".section .rodata.s2blob,\"a\"\n.globl s2blob\ns2blob:\n.incbin \"" S2CM "\"\n.previous\n");
 
@@ -33,20 +39,74 @@ __asm__(".section .rodata.s2blob,\"a\"\n.globl s2blob\ns2blob:\n.incbin \"" S2CM
 extern const unsigned char s2blob[];
 __attribute__((used, noinline))
 static void decode_startup(void) {
+#if DW_TREE_BITS
     uint8_t *const counts = (uint8_t *)((uintptr_t)S2BASE + S2MEM);
+    uint8_t *rows[BOOT_NM];
+#elif DW_EXACT
+    typedef struct { uint64_t key; uint32_t row; } Entry;
+    _Static_assert(sizeof(Entry) == 16, "directory layout");
+    Entry *const directory = (Entry *)((uintptr_t)S2BASE + S2MEM);
+    uint8_t *const counts = (uint8_t *)(directory + BOOT_NM * 32768u);
+    uint32_t used = 0;
+    uint64_t masks[BOOT_NM];
+    uint8_t *rows[BOOT_NM];
+    for (unsigned m = 0; m < BOOT_NM; ++m) {
+        uint64_t mask = 0;
+        for (unsigned j = 0; j < 8; ++j)
+            if ((cut_models[m] >> j) & 1u) mask |= UINT64_C(255) << (8 * j);
+        masks[m] = mask;
+    }
+#else
+    uint8_t *const counts = (uint8_t *)((uintptr_t)S2BASE + S2MEM);
+#endif
     uint8_t *const output = (uint8_t *)(uintptr_t)S2BASE;
     const uint8_t *stream = s2blob;
     uint32_t lo = 0, hi = UINT32_MAX, code = 0;
     uint64_t history = 0;
     for (unsigned i = 0; i < 4; ++i) code = (code << 8) | *stream++;
     for (unsigned pos = 0; pos < S2LEN; ++pos) {
+#if DW_TREE_BITS
+        for (unsigned m = 0; m < BOOT_NM; ++m) {
+            uint64_t key = m + 1u, bytes = history;
+#if DW_CLASSES
+            const unsigned keep = cut_models[(1 + DW_BANKS) * BOOT_NM + m];
+#else
+            const unsigned keep = 255;
+#endif
+            for (unsigned mask = cut_models[m]; mask; mask >>= 1, bytes >>= 8) {
+                if (mask & 1) key = ((key << 8) | (key >> 56)) ^ (bytes & keep);
+            }
+            key ^= key >> 29;
+            key *= UINT64_C(0x9e3779b97f4a7c15);
+            rows[m] = counts + ((key >> (64 - DW_TREE_BITS)) << 9);
+        }
+#elif DW_EXACT
+        for (unsigned m = 0; m < BOOT_NM; ++m) {
+            uint64_t key = history & masks[m];
+            Entry *bank = directory + m * 32768u;
+            unsigned i = (unsigned)((key * UINT64_C(0x9e3779b97f4a7c15)) >> 49);
+            while (bank[i].row && bank[i].key != key) i = (i + 1) & 32767u;
+            if (!bank[i].row) {
+                bank[i].key = key;
+                bank[i].row = ++used;
+            }
+            rows[m] = counts + bank[i].row * 512u;
+        }
+#endif
         unsigned prefix = 1;
         for (unsigned b = 0; b < 8; ++b) {
             const unsigned group = ((pos >> DW_REGION_SHIFT) * DW_BIT_GROUPS) + (b >> DW_BIT_SHIFT);
             const uint8_t *weight = cut_models + (1 + group) * BOOT_NM;
+#if !DW_TREE_BITS
             uint8_t *slots[BOOT_NM];
+#endif
             unsigned n0 = BOOT_EPS, n1 = BOOT_EPS;
             for (unsigned m = 0; m < BOOT_NM; ++m) {
+#if DW_TREE_BITS
+                uint8_t *pair = rows[m] + 2 * prefix;
+#elif DW_EXACT
+                uint8_t *pair = slots[m] = rows[m] + 2 * prefix;
+#else
                 uint64_t key = prefix, bytes = history;
                 for (unsigned mask = cut_models[m]; mask; mask >>= 1) {
                     if (mask & 1) key = key * UINT64_C(0x100000001b3) + (bytes & 255);
@@ -54,15 +114,22 @@ static void decode_startup(void) {
                 }
                 key = (key + m * UINT64_C(0x9e3779b97f4a7c15)) * UINT64_C(0x2545f4914f6cdd1d);
                 uint8_t *pair = slots[m] = counts + 2 * (key >> BOOT_SHIFT);
+#endif
                 unsigned a = pair[0], b1 = pair[1];
                 if (!a) b1 *= DW_BOOST;
                 if (!b1) a *= DW_BOOST;
                 n0 += a * weight[m];
                 n1 += b1 * weight[m];
             }
+#if DW_NARROW
+            unsigned prob = (n1 << 12) / (n0 + n1);
+#else
             unsigned prob = (unsigned)(((uint64_t)n1 << 12) / (n0 + n1));
+#endif
             if (!prob) prob = 1;
+#if !DW_TREE_BITS
             if (prob > 4095) prob = 4095;
+#endif
             const uint32_t boundary = lo + (uint32_t)(((uint64_t)(hi-lo) * prob) >> 12);
             const unsigned bit = code <= boundary;
             if (bit) hi = boundary;
@@ -73,7 +140,11 @@ static void decode_startup(void) {
                 hi = (hi << 8) | 255;
             }
             for (unsigned m = 0; m < BOOT_NM; ++m) {
+#if DW_TREE_BITS
+                uint8_t *pair = rows[m] + 2 * prefix;
+#else
                 uint8_t *pair = slots[m];
+#endif
                 if (pair[bit] != BOOT_CAP) ++pair[bit];
                 if (pair[bit ^ 1] > DW_KEEP) pair[bit ^ 1] = (pair[bit ^ 1] >> DW_DECAY) + DW_KEEP;
             }
@@ -100,7 +171,9 @@ __asm__(
   ".globl _start\n"
   "_start:\n"
   "  mov %rsp,%rbp\n"                   /* original sp (passed to stage 2) */
+#if !DW_TREE_BITS
   "  sub $384,%rsp\n"
+#endif
   /* mmap(S2BASE, S2MEM + table, RWX, PRIVATE|ANON|FIXED, -1, 0) */
   "  push $9\n  pop %rax\n"
   "  mov $" STR(S2BASE) ",%edi\n"

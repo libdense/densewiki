@@ -3,25 +3,25 @@
   "flat_sha256": "d3d7d0708597baef9b55259f7a63541494e173e93b046de06444d6819b29715a",
   "flat_bytes": 12311,
   "old_head_bytes": 7919,
-  "new_head_bytes": 7848,
-  "candidate_coded_bytes": 7110,
-  "candidate_decoder_prefix_sha256": "b6ea5b4882eafe82dcd68f4c5cd2e55441846513eada19fb3847ff9cf159a7d2",
+  "new_head_bytes": 7629,
+  "candidate_coded_bytes": 6841,
+  "candidate_decoder_prefix_sha256": "59c35d921d30040ce67606c3d1f555de5dfa5927b6d42c851ea6827f92aace54",
   "files": {
     "comp9": {
       "upstream_bytes": 4057131,
-      "bytes": 4057060,
-      "sha256": "f588fddbcf52ab79d6b0154c8c64eaffdcb6780ac03fdba6fa21386d55614f5e",
+      "bytes": 4056841,
+      "sha256": "6b8f2b51de02bdd5c91cf52240332f8b454d98e04798dac8c367f4706e6a3748",
       "unchanged_suffix_bytes": 4049212,
       "unchanged_suffix_sha256": "5d7191b1d92f1187e7ac1b6f7dd889102f95bae074ddbb44b633cad65bf48332"
     },
     "archive9": {
       "upstream_bytes": 88983124,
-      "bytes": 88983053,
-      "sha256": "b3540b6021d7a21c54d4865cca1e9638539370ab33db8a29e3e1b38647667c5e",
+      "bytes": 88982834,
+      "sha256": "9c6049f0f190685dd460637c3927356b63ccf14d65fa737417cdc16bc4ba5ecd",
       "unchanged_suffix_bytes": 88975205,
       "unchanged_suffix_sha256": "2f043c4a157cc8804cffad4889e74dd35b57c338ab2cfe05173d0100ea42c6f5"
     }
   },
-  "total_bytes": 93040113,
-  "saving_bytes": 142
+  "total_bytes": 93039675,
+  "saving_bytes": 580
 }
