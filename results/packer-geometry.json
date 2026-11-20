@@ -1,0 +1,21 @@
+{
+  "scope": "offline native-program stream lengths, x86-64 GCC 14.2.0, size profile, excluding stage-one header",
+  "baseline": {
+    "params": {},
+    "cut": 190664,
+    "full": 218089,
+    "s2disk": 12343,
+    "s2end": 12068
+  },
+  "compact": {
+    "params": {
+      "sh": 26,
+      "mmhb": 21,
+      "msb": 13
+    },
+    "cut": 190939,
+    "full": 218512,
+    "s2disk": 12343,
+    "s2end": 12068
+  }
+}

@@ -90,5 +90,13 @@
   "prior": 24,
   "exact": false,
   "tree_bits": 20,
-  "optimization": "-Os"
+  "optimization": "-Os",
+  "elf_arena": true,
+  "sparse_rows": true,
+  "compiler_flags": [
+    "-fno-forward-propagate",
+    "-fno-move-loop-invariants",
+    "-fno-tree-forwprop",
+    "-fno-tree-pre"
+  ]
 }

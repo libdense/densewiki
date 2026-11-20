@@ -4,7 +4,7 @@
  * code, then the stage-2 stream. */
 PHDRS { load PT_LOAD FILEHDR PHDRS FLAGS(7); }
 SECTIONS {
-  . = 0x400000 + SIZEOF_HEADERS;
+  . = (DEFINED(arena_end) ? 0x0fffe000 : 0x400000) + SIZEOF_HEADERS;
   .cuthdr : { KEEP(*(.cuthdr)) } :load
   .cutmodels : { KEEP(*(.cutmodels)) } :load
   .text : { *(.text .text.*) } :load

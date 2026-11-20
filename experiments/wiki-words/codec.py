@@ -98,15 +98,26 @@ def main():
     parser.add_argument("operation", choices=("encode", "decode"))
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--mode", choices=("auto", "raw", "words"), default="auto")
+    parser.add_argument("--mode", choices=("auto", "raw", "words", "wiki"), default="auto")
+    parser.add_argument("--format", choices=("DWX2", "DWX3"), default="DWX3", help="encoding format")
     args = parser.parse_args()
     # Publish only a fully written file, and preserve an existing output on failure.
     with args.source.open("rb") as source, tempfile.NamedTemporaryFile(dir=args.output.parent) as out:
         if args.operation == "encode":
-            stats = encode(source, out, args.mode)
-            print(f"{stats['raw_blocks']} raw blocks, {stats['dictionary_blocks']} dictionary blocks", file=sys.stderr)
+            if args.format == "DWX2":
+                if args.mode == "wiki":
+                    parser.error("--mode wiki requires DWX3")
+                stats = encode(source, out, args.mode)
+            else:
+                from wiki3 import encode_v3
+                modes = {"raw": (0,), "words": (1, 3), "wiki": (3,), "auto": (0, 1, 3)}
+                stats = encode_v3(source, out, modes[args.mode])
+            print(f"{stats}", file=sys.stderr)
         else:
-            decode(source, out)
+            from wiki3_decoder import MAGIC3, decode as decode_v3
+            magic = source.read(4)
+            source.seek(0)
+            (decode_v3 if magic == MAGIC3 else decode)(source, out)
         out.flush()
         os.link(out.name, args.output)
 

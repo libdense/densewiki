@@ -15,7 +15,7 @@ SOURCES = {
     "size": ("ex-girlfriend-2.0", "de6e996caa4fa978d663e3ff3c419f90a5e9a712a7d2b358d92899031a3ed410", "ex2"),
     "prize": ("cmix-neif-2.0", "bb7a8ab89bdabdd680d592da1c4c8bd2be26c1e6bc0412c8c4126758f2086f3f", "neif"),
 }
-ARMS = ("size-original", "size-shared", "prize-original", "prize-shared", "prize-47")
+ARMS = ("size-original", "size-shared", "prize-original", "prize-shared", "prize-47", "prize-lowmem")
 
 
 def prepare(arm, output):
@@ -36,11 +36,13 @@ def prepare(arm, output):
         if mode != "original":
             patches = ROOT / "experiments/shared-sketch"
             shutil.copy2(patches / "densewiki_sketch.h", tree / "src")
-            names = [f"{patch_name}-shared-sketch.patch"]
+            names = [patches / f"{patch_name}-shared-sketch.patch"]
             if mode == "47":
-                names.append("neif-wide47.patch")
+                names.append(patches / "neif-wide47.patch")
+            if mode == "lowmem":
+                names.append(ROOT / "experiments/low-memory/prize-low-memory.patch")
             for patch in names:
-                with (patches / patch).open("rb") as diff:
+                with patch.open("rb") as diff:
                     subprocess.run(["patch", "--batch", "--forward", "-p1"], stdin=diff, cwd=tree, check=True)
         if output.exists():
             raise FileExistsError(output)

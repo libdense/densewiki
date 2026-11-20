@@ -40,7 +40,11 @@ def materialize(profile, output, original=False, reference_archive=None):
         dest = Path(tmp) / "publish"
         dest.mkdir()
         for name, data in files.items():
-            if digest(data) != record["files"][name]["sha256"]:
+            info = record["files"][name]
+            offset = struct.unpack_from("<I", data, 120)[0]
+            if len(data) != info["bytes"] or digest(data[offset:]) != info["unchanged_suffix_sha256"]:
+                raise ValueError(f"candidate {name} length or suffix mismatch")
+            if digest(data) != info["sha256"]:
                 raise ValueError(f"candidate {name} SHA-256 mismatch")
             if original:
                 data = reference_head(data, original_head)

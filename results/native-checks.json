@@ -4,13 +4,13 @@
   "files": {
     "comp9": {
       "reference_sha256": "8d2a5fd03da10e671286726ab620183c0b6072ba68021c03076304e29f80406a",
-      "candidate_sha256": "6b8f2b51de02bdd5c91cf52240332f8b454d98e04798dac8c367f4706e6a3748",
+      "candidate_sha256": "b7efc3e8aafec92353e5047397510e6a92ef357be9f101fd5f066e1f46aea4a2",
       "identical_suffix_bytes": 4049212,
       "identical_suffix_sha256": "5d7191b1d92f1187e7ac1b6f7dd889102f95bae074ddbb44b633cad65bf48332"
     },
     "archive9": {
       "reference_sha256": "0b65bc79917f84b78f4974a2dc94d4d4c3fc6c0c53234bdcb6c282db802635a3",
-      "candidate_sha256": "9c6049f0f190685dd460637c3927356b63ccf14d65fa737417cdc16bc4ba5ecd",
+      "candidate_sha256": "4659522f09a1055b6663d0467960e352bbf93f687b19ad2277a574476b2a3c07",
       "identical_suffix_bytes": 88975205,
       "identical_suffix_sha256": "2f043c4a157cc8804cffad4889e74dd35b57c338ab2cfe05173d0100ea42c6f5"
     }
@@ -27,7 +27,7 @@
       "self_path_trailers_valid": true
     }
   },
-  "decoder_prefix_bytes": 198287,
+  "decoder_prefix_bytes": 198255,
   "weights_bytes": 3744629,
   "payload_bytes": 85039910,
   "trailer_bytes": 8,
@@ -36,8 +36,8 @@
       "mode": "encode",
       "files": {
         ".decomp_bin": {
-          "bytes": 198287,
-          "sha256": "59c35d921d30040ce67606c3d1f555de5dfa5927b6d42c851ea6827f92aace54"
+          "bytes": 198255,
+          "sha256": "9317d7b84aa3c3c089a03e79c714ca7ca0d6c70a78d6cf6ee34dc509c91b3fb1"
         }
       }
     },
@@ -56,9 +56,9 @@
     }
   },
   "encoder_prefix_test_input": {
-    "description": "upstream profiling fixture, used only to reach decoder-prefix emission",
-    "bytes": 930723,
-    "sha256": "7dc711344aaa6e9b8fab85cd4b5b5e97c3be4d98c29b2c9f479ab774a3c7cbc2"
+    "description": "canonical enwik9 used for decoder-prefix emission",
+    "bytes": 1000000000,
+    "sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc"
   },
   "full_candidate_enwik9_roundtrip": false
 }

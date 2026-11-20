@@ -1,0 +1,18 @@
+{
+  "format": "DWX2",
+  "input_bytes": 1000000000,
+  "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+  "canonical_enwik9": true,
+  "stream_bytes": 255483667,
+  "stream_sha256": "b50769adb2ac002f68077e97cffb5a2592169c412b9bbb737d6e1a23e40029ff",
+  "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+  "byte_comparison": "equal",
+  "encode": {
+    "peak_rss_kib": 59728,
+    "wall_seconds": 714.158
+  },
+  "decode": {
+    "peak_rss_kib": 20248,
+    "wall_seconds": 114.931
+  }
+}

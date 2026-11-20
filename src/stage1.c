@@ -9,6 +9,7 @@
  * the second stage and passes it the original process stack and header.
  */
 #include <stdint.h>
+#include <stddef.h>
 #include "policy.h"
 
 _Static_assert(BOOT_SHIFT == 64 - BOOT_TB, "BOOT_SHIFT must be 64-BOOT_TB");
@@ -41,6 +42,11 @@ __attribute__((used, noinline))
 static void decode_startup(void) {
 #if DW_TREE_BITS
     uint8_t *const counts = (uint8_t *)((uintptr_t)S2BASE + S2MEM);
+#if DW_SPARSE
+    uint32_t *const directory = (uint32_t *)counts;
+    uint8_t *const slabs = counts + (4u << DW_TREE_BITS);
+    uint32_t used = 0;
+#endif
     uint8_t *rows[BOOT_NM];
 #elif DW_EXACT
     typedef struct { uint64_t key; uint32_t row; } Entry;
@@ -74,11 +80,23 @@ static void decode_startup(void) {
             const unsigned keep = 255;
 #endif
             for (unsigned mask = cut_models[m]; mask; mask >>= 1, bytes >>= 8) {
-                if (mask & 1) key = ((key << 8) | (key >> 56)) ^ (bytes & keep);
+                if (mask & 1) {
+#if DW_SHORT_KEYS
+                    key = (key << 8) | (bytes & keep);
+#else
+                    key = ((key << 8) | (key >> 56)) ^ (bytes & keep);
+#endif
+                }
             }
             key ^= key >> 29;
             key *= UINT64_C(0x9e3779b97f4a7c15);
-            rows[m] = counts + ((key >> (64 - DW_TREE_BITS)) << 9);
+            const unsigned index = (unsigned)(key >> (64 - DW_TREE_BITS));
+#if DW_SPARSE
+            if (!directory[index]) directory[index] = ++used;
+            rows[m] = slabs + ((size_t)directory[index] << 9);
+#else
+            rows[m] = counts + ((size_t)index << 9);
+#endif
         }
 #elif DW_EXACT
         for (unsigned m = 0; m < BOOT_NM; ++m) {
@@ -174,6 +192,7 @@ __asm__(
 #if !DW_TREE_BITS
   "  sub $384,%rsp\n"
 #endif
+  #if !DW_ELF_ARENA
   /* mmap(S2BASE, S2MEM + table, RWX, PRIVATE|ANON|FIXED, -1, 0) */
   "  push $9\n  pop %rax\n"
   "  mov $" STR(S2BASE) ",%edi\n"
@@ -187,7 +206,14 @@ __asm__(
   "  je 1f\n"
   "  push $110\n  pop %rdi\n  mov $231,%eax\n  syscall\n"
   "1:\n"
+  #endif
   "  call decode_startup\n"
+#if DW_ELF_ARENA
+  /* The loader supplies zeroed pages. Drop the counts before the next model starts. */
+  "  mov $(" STR(S2BASE) "+" STR(S2MEM) "),%edi\n"
+  "  mov $" STR(BOOT_TSZ) ",%esi\n"
+  "  push $11\n  pop %rax\n  syscall\n"
+#endif
   /* stage 2: s2_main(original_sp, header); does not return */
   "  mov %rbp,%rdi\n"
   "  mov $cut_hdr,%esi\n"

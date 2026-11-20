@@ -1,0 +1,140 @@
+{
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "compiler": "14.2.0",
+  "units": "Linux wait4 ru_maxrss, KiB per fresh process",
+  "offset": 87537,
+  "trials": [
+    {
+      "raw_bytes": 16384,
+      "raw_sha256": "848a0ce71be215fcb4d6415a6508e416b8f814bf80e9813a4288dc30627e31a8",
+      "stream_bytes": 17128,
+      "stream_sha256": "6cfde877ba1ca02b038a953097649fa0c7a9764a4baacf095d474ba0c06207db",
+      "source_file": "prof_input/input2",
+      "source_sha256": "7dc711344aaa6e9b8fab85cd4b5b5e97c3be4d98c29b2c9f479ab774a3c7cbc2",
+      "runs": {
+        "baseline_encode": {
+          "peak_rss_kib": 5845572,
+          "wall_seconds": 17.188,
+          "output_bytes": 6624,
+          "output_sha256": "9b4e369db63d960fe925c559f066fa4aa4aa4bc25e494d9503d9d161c0e5a5ed",
+          "semantic_insertions": 14472,
+          "semantic_positions": 17128
+        },
+        "lowmem_encode": {
+          "peak_rss_kib": 2990184,
+          "wall_seconds": 11.5,
+          "output_bytes": 6624,
+          "output_sha256": "9b4e369db63d960fe925c559f066fa4aa4aa4bc25e494d9503d9d161c0e5a5ed",
+          "semantic_insertions": 14472,
+          "semantic_positions": 17128
+        },
+        "baseline_cross_decode": {
+          "peak_rss_kib": 5845548,
+          "wall_seconds": 13.82,
+          "output_bytes": 17128,
+          "output_sha256": "6cfde877ba1ca02b038a953097649fa0c7a9764a4baacf095d474ba0c06207db",
+          "semantic_insertions": 14472,
+          "semantic_positions": 17128
+        },
+        "lowmem_cross_decode": {
+          "peak_rss_kib": 2990156,
+          "wall_seconds": 12.576,
+          "output_bytes": 17128,
+          "output_sha256": "6cfde877ba1ca02b038a953097649fa0c7a9764a4baacf095d474ba0c06207db",
+          "semantic_insertions": 14472,
+          "semantic_positions": 17128
+        }
+      },
+      "encoded_equal": true,
+      "both_cross_decodes_match_raw_xml": true
+    },
+    {
+      "raw_bytes": 32768,
+      "raw_sha256": "1f3c2c4b3d2b65634613f57ccea253dbd5bd5f3bc312711ed7b64a86e95ad7de",
+      "stream_bytes": 36110,
+      "stream_sha256": "d91d9aabd4bd44dc85f0a3d45d74a90bd5d6fd330ad8dcae31b915872f82ea58",
+      "source_file": "prof_input/input2",
+      "source_sha256": "7dc711344aaa6e9b8fab85cd4b5b5e97c3be4d98c29b2c9f479ab774a3c7cbc2",
+      "runs": {
+        "baseline_encode": {
+          "peak_rss_kib": 6674348,
+          "wall_seconds": 26.307,
+          "output_bytes": 11464,
+          "output_sha256": "b7df1e1872c06b6895d702d4ced178ac0610e7b683b53093eb83df3ff361c2dc",
+          "semantic_insertions": 27080,
+          "semantic_positions": 36110
+        },
+        "lowmem_encode": {
+          "peak_rss_kib": 3848048,
+          "wall_seconds": 28.117,
+          "output_bytes": 11464,
+          "output_sha256": "b7df1e1872c06b6895d702d4ced178ac0610e7b683b53093eb83df3ff361c2dc",
+          "semantic_insertions": 27080,
+          "semantic_positions": 36110
+        },
+        "baseline_cross_decode": {
+          "peak_rss_kib": 6673016,
+          "wall_seconds": 26.123,
+          "output_bytes": 36110,
+          "output_sha256": "d91d9aabd4bd44dc85f0a3d45d74a90bd5d6fd330ad8dcae31b915872f82ea58",
+          "semantic_insertions": 27080,
+          "semantic_positions": 36110
+        },
+        "lowmem_cross_decode": {
+          "peak_rss_kib": 3848000,
+          "wall_seconds": 28.233,
+          "output_bytes": 36110,
+          "output_sha256": "d91d9aabd4bd44dc85f0a3d45d74a90bd5d6fd330ad8dcae31b915872f82ea58",
+          "semantic_insertions": 27080,
+          "semantic_positions": 36110
+        }
+      },
+      "encoded_equal": true,
+      "both_cross_decodes_match_raw_xml": true
+    },
+    {
+      "raw_bytes": 65536,
+      "raw_sha256": "f1074b1ef141c8c057c6239766d1e119ace127208bffc533c245142d015a4fb3",
+      "stream_bytes": 74744,
+      "stream_sha256": "d87e583df6f46fe1b14444ad376c18dd09244891ddc07fc2910106de7075dc4a",
+      "source_file": "prof_input/input2",
+      "source_sha256": "7dc711344aaa6e9b8fab85cd4b5b5e97c3be4d98c29b2c9f479ab774a3c7cbc2",
+      "runs": {
+        "baseline_encode": {
+          "peak_rss_kib": 7272256,
+          "wall_seconds": 54.366,
+          "output_bytes": 18802,
+          "output_sha256": "8e0803f66960d392012f10202089a517d38c8dd2f2669deecf6f0e51c065246d",
+          "semantic_insertions": 47378,
+          "semantic_positions": 74744
+        },
+        "lowmem_encode": {
+          "peak_rss_kib": 4455680,
+          "wall_seconds": 50.055,
+          "output_bytes": 18802,
+          "output_sha256": "8e0803f66960d392012f10202089a517d38c8dd2f2669deecf6f0e51c065246d",
+          "semantic_insertions": 47378,
+          "semantic_positions": 74744
+        },
+        "baseline_cross_decode": {
+          "peak_rss_kib": 7270884,
+          "wall_seconds": 46.86,
+          "output_bytes": 74744,
+          "output_sha256": "d87e583df6f46fe1b14444ad376c18dd09244891ddc07fc2910106de7075dc4a",
+          "semantic_insertions": 47378,
+          "semantic_positions": 74744
+        },
+        "lowmem_cross_decode": {
+          "peak_rss_kib": 4455972,
+          "wall_seconds": 50.566,
+          "output_bytes": 74744,
+          "output_sha256": "d87e583df6f46fe1b14444ad376c18dd09244891ddc07fc2910106de7075dc4a",
+          "semantic_insertions": 47378,
+          "semantic_positions": 74744
+        }
+      },
+      "encoded_equal": true,
+      "both_cross_decodes_match_raw_xml": true
+    }
+  ]
+}

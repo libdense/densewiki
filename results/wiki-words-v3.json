@@ -1,0 +1,92 @@
+{
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "samples": {
+    "wiki-prefix": {
+      "input_bytes": 880672,
+      "input_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+      "variants": {
+        "DWX2": {
+          "stream_bytes": 247974,
+          "stream_sha256": "bf6d3a8eed8f07f0cfef3ee3a19a0a049862d77cdb8d9aa23a0836a0d4c09c43",
+          "runnable_bytes": 249424,
+          "runnable_sha256": "9fe18b2bb4d07436f8047ec0853beb5ca43c48f6d510151f2877915db70c57f1",
+          "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+          "encode": {
+            "peak_rss_kib": 36188,
+            "wall_seconds": 0.78
+          },
+          "standalone_decode": {
+            "peak_rss_kib": 12068,
+            "wall_seconds": 0.186
+          }
+        },
+        "DWX3": {
+          "stream_bytes": 242850,
+          "stream_sha256": "65234f4175625eb89837c46bf028196fed2cb4d60e367bf3d70bbfd0b9b50a51",
+          "runnable_bytes": 244862,
+          "runnable_sha256": "51a315e2862c81cad957795a495aca000677a8cf9f6d8b35b34c52b0c2e2aeae",
+          "restored_sha256": "190985332017b490c6ad8d31043c56afb18248d12342b936389d6aa1de25ec0f",
+          "encode": {
+            "peak_rss_kib": 23836,
+            "wall_seconds": 1.094
+          },
+          "standalone_decode": {
+            "peak_rss_kib": 13228,
+            "wall_seconds": 0.269
+          }
+        }
+      },
+      "ablation_stream_bytes": {
+        "raw": 255454,
+        "words": 246694,
+        "words_case": 243566,
+        "words_case_fields": 242850,
+        "words_fields": 245962
+      }
+    },
+    "profiling-tail": {
+      "input_bytes": 50051,
+      "input_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+      "variants": {
+        "DWX2": {
+          "stream_bytes": 8350,
+          "stream_sha256": "b656490439b33395ea7de829877f98d61b99c1b06910a7e543d5c99c9f2e3691",
+          "runnable_bytes": 9800,
+          "runnable_sha256": "d0450c8d1c61801b8894b918919a22c3cfc7f53afc02d877b3519e652b486903",
+          "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+          "encode": {
+            "peak_rss_kib": 27280,
+            "wall_seconds": 0.122
+          },
+          "standalone_decode": {
+            "peak_rss_kib": 9984,
+            "wall_seconds": 0.051
+          }
+        },
+        "DWX3": {
+          "stream_bytes": 8302,
+          "stream_sha256": "53737f2c6ffc29fedd48fdffea221e79921fdb7f1eb243b7cd60afc752da1e1f",
+          "runnable_bytes": 10314,
+          "runnable_sha256": "233930fa58397f4d82c07c35d172efe2209efad404b9645ed6fe230a3c2d4a98",
+          "restored_sha256": "890b3e1210a24a249768d86bd5a79a1775ce19b2d56984ce3069ee26359ef2e6",
+          "encode": {
+            "peak_rss_kib": 11408,
+            "wall_seconds": 0.123
+          },
+          "standalone_decode": {
+            "peak_rss_kib": 9984,
+            "wall_seconds": 0.048
+          }
+        }
+      },
+      "ablation_stream_bytes": {
+        "raw": 8306,
+        "words": 8302,
+        "words_case": 8314,
+        "words_case_fields": 8354,
+        "words_fields": 8342
+      }
+    }
+  }
+}

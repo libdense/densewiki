@@ -53,6 +53,10 @@ def linked_image(p, coded, cwd):
     encode_policy(p)
     if p.get("optimization", "-Os") not in ("-Os", "-Oz"):
         raise ValueError("unsupported compiler optimization")
+    compiler_flags = p.get("compiler_flags", [])
+    allowed_flags = {"-fno-forward-propagate", "-fno-move-loop-invariants", "-fno-tree-forwprop", "-fno-tree-pre"}
+    if not isinstance(compiler_flags, list) or any(f not in allowed_flags for f in compiler_flags):
+        raise ValueError("unsupported compiler flags")
     masks = p["masks"]
     weights = [x for bank in p["weights"] for x in bank]
     bits = 8 >> p["bit_shift"]
@@ -63,8 +67,17 @@ def linked_image(p, coded, cwd):
     count_bytes = (1 + len(masks) * FLAT_SIZE) * 512
     tree_bits = p.get("tree_bits", 0)
     table_bytes = directory_bytes + count_bytes if exact else (512 << tree_bits if tree_bits else 8388608)
+    sparse = p.get("sparse_rows", False)
+    arena = p.get("elf_arena", False)
+    if sparse:
+        if not tree_bits:
+            raise ValueError("sparse_rows needs a hashed row table")
+        table_bytes = (4 << tree_bits) + (1 + min(1 << tree_bits, len(masks) * FLAT_SIZE)) * 512
+    # The release masks append at most seven bytes after their model identifier.
+    short_keys = arena and max(mask.bit_count() for mask in masks) <= 7
     narrow = tree_bits and max(sum(bank) for bank in p["weights"]) * cap * boost + p["prior"] < (1 << 20)
-    macros = {"DW_NARROW": int(bool(narrow)), "DW_CLASSES": int(bool(p.get("classes"))), "DW_CLASS_LIST": ",".join(map(str, p.get("classes", []))),
+    macros = {"DW_ELF_ARENA": int(arena), "DW_SPARSE": int(sparse), "DW_SHORT_KEYS": int(short_keys),
+              "DW_NARROW": int(bool(narrow)), "DW_CLASSES": int(bool(p.get("classes"))), "DW_CLASS_LIST": ",".join(map(str, p.get("classes", []))),
               "DW_TREE_BITS": tree_bits, "DW_EXACT": int(exact), "DW_BOOST": boost, "DW_DECAY": decay, "DW_KEEP": keep, "DW_BRANCHES": int(p.get("branches", False)),
               "BOOT_NM": len(masks), "BOOT_TB": 22, "BOOT_SHIFT": 42, "BOOT_TSZ": table_bytes,
               "BOOT_EPS": p["prior"], "BOOT_CAP": cap, "DW_REGION_SHIFT": p["region_shift"],
@@ -75,10 +88,11 @@ def linked_image(p, coded, cwd):
     (cwd / "policy.h").write_text("".join(f"#define {key} {v}\n" for key, v in macros.items()))
     (cwd / "stage.coded").write_bytes(coded)
     cc = os.environ.get("CC", "cc")
-    subprocess.run([cc, p.get("optimization", "-Os"), "-nostdlib", "-static", "-ffreestanding", "-fno-pie", "-no-pie",
+    subprocess.run([cc, *compiler_flags, p.get("optimization", "-Os"), "-nostdlib", "-static", "-ffreestanding", "-fno-pie", "-no-pie",
                     "-fno-asynchronous-unwind-tables", "-fno-stack-protector", "-fcf-protection=none",
                     "-fdata-sections", "-ffunction-sections", "-I.", "-DS2BASE=0x10000000",
                     "-DS2MEM=0x18aa000", f"-DS2LEN={FLAT_SIZE}", '-DS2CM="stage.coded"',
+                    *(["-Wl,--defsym,arena_end=" + hex(0x10000000 + 0x18aa000 + table_bytes)] if arena else []),
                     f"-Wl,-T,{ROOT / 'src/stage1.ld'}", "-Wl,--build-id=none", "-Wl,--gc-sections",
                     "-Wl,-e,_start", str(ROOT / "src/stage1.c"), "-o", "stage.elf"],
                    cwd=cwd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -87,9 +101,15 @@ def linked_image(p, coded, cwd):
         struct.unpack_from("<HH", elf, 54) != (56, 1)):
         raise ValueError("unexpected ELF layout")
     typ, flags, offset, vaddr, _, file_size, mem_size, _ = struct.unpack_from("<IIQQQQQQ", elf, 64)
-    if (typ != 1 or flags != 7 or offset or vaddr != 0x400000 or file_size != mem_size or
+    base = 0x0fffe000 if arena else 0x400000
+    expected_memory = 0x10000000 + 0x18aa000 + table_bytes - base if arena else file_size
+    if (typ != 1 or flags != 7 or offset or vaddr != base or mem_size != file_size or
+        (arena and file_size > 8192) or
         file_size > len(elf) or elf[file_size-len(coded):file_size] != coded):
         raise ValueError("linked data differs from the checked coder stream")
+    # ELF zero-fills p_memsz minus p_filesz. Keep the entire count arena off disk.
+    if arena:
+        struct.pack_into("<Q", elf, 104, expected_memory)
     model_bytes = bytes(masks + weights + p.get("classes", []))
     if elf[144:144 + len(model_bytes)] != model_bytes:
         raise ValueError("linked model table mismatch")
@@ -146,7 +166,7 @@ def build(args):
     inputs = {"comp9": checked_input(source, "comp9", args.profile)}
     if (source / "archive9").exists():
         inputs["archive9"] = checked_input(source, "archive9", args.profile)
-    policy_path = args.policy or ROOT / ("results/policy.json" if args.profile == "size" else "results/v0.0.1/policy.json")
+    policy_path = args.policy or ROOT / "results/policy.json"
     policy = json.loads(policy_path.read_text())
     with tempfile.TemporaryDirectory() as scratch, tempfile.TemporaryDirectory(dir=destination.parent) as staging:
         temp, stage = Path(scratch), Path(staging) / "publish"

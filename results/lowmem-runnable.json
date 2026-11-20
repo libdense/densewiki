@@ -1,0 +1,12 @@
+{
+  "file": "densewiki-v0.0.3-enwik9-lowmem.pyz",
+  "archive_bytes": 249753359,
+  "archive_sha256": "7558a7fb41294325a4a152f37a3ddc757682e124239f8411c2293d88e32b4f85",
+  "output_bytes": 1000000000,
+  "output_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+  "byte_comparison": "equal",
+  "decode": {
+    "peak_rss_kib": 16128,
+    "wall_seconds": 223.001
+  }
+}

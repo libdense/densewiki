@@ -1,0 +1,73 @@
+{
+  "scope": "Linux wait4 peak RSS through native image reconstruction; stops before Wikipedia model main",
+  "profiles": {
+    "size": {
+      "compressor": {
+        "v0.0.2": {
+          "peak_rss_kib": 1771008,
+          "wall_seconds": 83.66,
+          "native_bytes": 673070,
+          "native_sha256": "49856e03c8b072cf6ef49dd08d34a7caf35a47c655c325bc78123b8ebee595d7",
+          "self_path_verified": true
+        },
+        "v0.0.3": {
+          "peak_rss_kib": 1530268,
+          "wall_seconds": 61.609,
+          "native_bytes": 673070,
+          "native_sha256": "49856e03c8b072cf6ef49dd08d34a7caf35a47c655c325bc78123b8ebee595d7",
+          "self_path_verified": true
+        }
+      },
+      "archive": {
+        "v0.0.2": {
+          "peak_rss_kib": 1768192,
+          "wall_seconds": 50.986,
+          "native_bytes": 673070,
+          "native_sha256": "afa1fc062847e279771a4e48b3ec1c21d6b7fb34e857b1d24b7aec3c93941a45",
+          "self_path_verified": true
+        },
+        "v0.0.3": {
+          "peak_rss_kib": 1527452,
+          "wall_seconds": 52.233,
+          "native_bytes": 673070,
+          "native_sha256": "afa1fc062847e279771a4e48b3ec1c21d6b7fb34e857b1d24b7aec3c93941a45",
+          "self_path_verified": true
+        }
+      }
+    },
+    "prize": {
+      "compressor": {
+        "v0.0.2": {
+          "peak_rss_kib": 1538048,
+          "wall_seconds": 55.813,
+          "native_bytes": 619918,
+          "native_sha256": "660f56c603c0c0549adbbf4c54721f531e3eaaa174108a3bea7e6bf4e7cbb8ad",
+          "self_path_verified": true
+        },
+        "v0.0.3": {
+          "peak_rss_kib": 1529884,
+          "wall_seconds": 58.552,
+          "native_bytes": 619918,
+          "native_sha256": "660f56c603c0c0549adbbf4c54721f531e3eaaa174108a3bea7e6bf4e7cbb8ad",
+          "self_path_verified": true
+        }
+      },
+      "decoder_prefix_only": {
+        "v0.0.2": {
+          "peak_rss_kib": 1534848,
+          "wall_seconds": 46.543,
+          "native_bytes": 619918,
+          "native_sha256": "649273d843000f224ef7180624b5df6f39c9e167f7f2599b9a0824ef1481bf91",
+          "self_path_verified": true
+        },
+        "v0.0.3": {
+          "peak_rss_kib": 1526680,
+          "wall_seconds": 46.48,
+          "native_bytes": 619918,
+          "native_sha256": "649273d843000f224ef7180624b5df6f39c9e167f7f2599b9a0824ef1481bf91",
+          "self_path_verified": true
+        }
+      }
+    }
+  }
+}

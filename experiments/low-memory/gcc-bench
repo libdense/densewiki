@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-only
+import os
+import sys
+args = []
+for prop in sys.argv[1:]:
+    if prop in ("-fno-direct-access-external-data", "-fno-c++-static-destructors", "-Wl,--icf=all") or prop.startswith("-fuse-ld="):
+        continue
+    args.append({"-ffp-model=fast": "-ffast-math", "-ffp-model=precise": "-fno-fast-math"}.get(prop, prop))
+os.execvp("g++", ["g++", "-include", "cstdint", "-include", "cstddef", "-include", "limits", "-Wno-attributes", *args])

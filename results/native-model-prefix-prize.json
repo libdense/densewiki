@@ -1,0 +1,20 @@
+{
+  "profile": "prize",
+  "unit": "first decoded model-stream bytes before inverse Wikipedia preprocessing",
+  "reference": {
+    "archive_sha256": "88dd7087404122d010261e6855afd88875d34dde1f0539377d3e832fc0f6b3fd",
+    "prefix_bytes": 16384,
+    "prefix_sha256": "7873d75659c431c948df9e2073d29bd7d9f0ea607655bae690d15e8075f25679",
+    "sampled_peak_tree_rss_kib": 4571044,
+    "wall_seconds": 80.792
+  },
+  "candidate": {
+    "archive_sha256": "3f0cada1b781742be9312b20c00bc6f3d56298d507e1e4b347d9bea21c8b247d",
+    "prefix_bytes": 16384,
+    "prefix_sha256": "7873d75659c431c948df9e2073d29bd7d9f0ea607655bae690d15e8075f25679",
+    "sampled_peak_tree_rss_kib": 4571396,
+    "wall_seconds": 70.582
+  },
+  "prefix_byte_comparison": "equal",
+  "full_enwik9_decode": false
+}

@@ -1,0 +1,20 @@
+{
+  "corpus": "enwik9",
+  "input": {
+    "bytes": 1000000000,
+    "sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc"
+  },
+  "python": "3.12.14",
+  "profiles": {
+    "raw": {
+      "archive_bytes": 263059071,
+      "archive_sha256": "4e8bbc179eb5ae17c9744a0f8ab4b48592de46b40a82df2c3ff9930398d3fcd6",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": "equal",
+      "encode_seconds": 366.44,
+      "decode_compare_seconds": 12.565,
+      "raw_blocks": 954,
+      "dictionary_blocks": 0
+    }
+  }
+}

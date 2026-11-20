@@ -1,0 +1,100 @@
+--- a/src/predictor.cpp
++++ b/src/predictor.cpp
+@@ -764,49 +764,28 @@
+ }
+ }  // namespace
+ 
+-// large zero-initialised table, transparent huge pages requested (2-MiB
+-// aligned).  reg: a table that is read before it is written (the buckets)
+-// gets the zero page on its first read and stays in 4-KiB pages after the
+-// first write; the periodic MADV_COLLAPSE of the allocation registry
+-// (huge_pages.h) turns its densely resident blocks into huge pages.
+-static void* SemTable(size_t bytes, bool reg) {
+-  const size_t kHuge = (size_t)2 << 20;
+-  const size_t len = (bytes + 2 * kHuge - 1) & ~(kHuge - 1);
+-  void* p = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
++// Anonymous base pages supply zeros until the first write. The cache does not
++// participate in the process-wide huge-page collapse pass.
++static void* SemTable(size_t bytes) {
++  void* p = mmap(nullptr, bytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+   if (p == MAP_FAILED) return nullptr;
+-  uintptr_t a = ((uintptr_t)p + kHuge - 1) & ~(uintptr_t)(kHuge - 1);
+-  madvise((void*)a, len - (a - (uintptr_t)p), MADV_HUGEPAGE);
+-  if (reg) PAGE_REGISTRY_ADD((void*)a, bytes);
+-  return (void*)a;
++  madvise(p, bytes, MADV_NOHUGEPAGE);
++  return p;
+ }
+ 
+ __attribute__((noinline)) COLD_SIZE_ATTR void Predictor::SemInit() {
+   using namespace semantic_cache;
+   semantic_cache::State& s = sem_;
+-  s.key = (uint8_t*)SemTable((size_t)kN * kKB, false);
+-  s.val = (uint8_t*)SemTable((size_t)kN, false);
+-  s.slot = (Slot*)SemTable(SharedSketch::bytes, true);
+-  s.epos = (uint32_t*)SemTable((size_t)kN * 4, false);
+-  s.hist = (uint8_t*)SemTable((size_t)kHist, false);
++  s.key = (uint8_t*)SemTable((size_t)kN * kKB);
++  s.val = (uint8_t*)SemTable((size_t)kN);
++  s.slot = (Slot*)SemTable(SharedSketch::bytes);
++  s.epos = (uint32_t*)SemTable((size_t)kN * 4);
++  s.hist = (uint8_t*)SemTable((size_t)kHist);
+   if (!s.key || !s.val || !s.slot || !s.epos || !s.hist) {
+     msg_note(553);
+     exit(1);
+   }
+-  // Resident now, at the first stream byte, behind room made in the PPMd
+-  // pool.  Lookups and entries start at the text; the bucket table is read
+-  // before it is written, and on a kernel that answers a write to the huge
+-  // zero page with a huge page its first few hundred entries made all 960 MiB
+-  // resident within 100 ms, after the pool had grown.  All of
+-  // it is resident at the end anyway.  Zero-filled, so no value changes.
+-  {
+-    const size_t n[5] = {(size_t)kN * kKB, (size_t)kN, SharedSketch::bytes,
+-                         (size_t)kN * 4, (size_t)kHist};
+-    void* const t[5] = {s.key, s.val, s.slot, s.epos, s.hist};
+-    unsigned long long sum = 0;
+-    for (int i = 0; i < 5; ++i) sum += n[i];
+-    if (ppmd_page::raum(sum))
+-      for (int i = 0; i < 5; ++i) memset(t[i], 0, n[i]);
+-  }
++  // Anonymous mappings already read as zero. The PPMd controller samples their actual RSS.
+   // one generator, in this order: projection, table hyperplanes, sketch hyperplanes
+   uint64_t r = 0x5EC0CAC4E2ULL;
+   for (int a = 0; a < kD; ++a)
+--- a/src/models/ppmd.cpp
++++ b/src/models/ppmd.cpp
+@@ -165,7 +165,7 @@
+ 
+   {
+     const unsigned long long puf =
+-      (unsigned long long)(1024) * 1024ULL * 1024ULL;
++      128ULL * 1024 * 1024;
+     const int rc = ppmd_page::start(t, puf, "ppm.page");
+     if( rc ) {
+       msg_note(36);
+--- a/src/models/ppmd_page.h
++++ b/src/models/ppmd_page.h
+@@ -17,9 +17,9 @@
+ // the process adds between two polls, so a growth is not undone by the next
+ // poll.
+ static const unsigned long long DYN_RESERVE_MIB = 32ULL;
+-// The jury clamp is max(ru_maxrss, process-tree sum) <= 10 GiB.
++// The paging controller targets 8 GiB of RSS before its safety margin.
+ static const unsigned long long DYN_KLEMME_KIB =
+-    (0) ? (0) : 10485760ULL;
++    8ULL * 1024 * 1024;
+ // Fixed safety margin below the clamp (the constant below).  It absorbs
+ // whatever the anonymous part adds between two polls; measured worst case with
+ // a coarse poll was 104 MiB.
+--- a/src/models/ppmd_page.cpp
++++ b/src/models/ppmd_page.cpp
+@@ -258,7 +258,7 @@
+     const unsigned long long ber_kib = (V.fehlgriff * SEITE) >> 10;
+     if (frei_kib > ber_kib) frei_kib = ber_kib;
+   }
+-  const unsigned long long max_kib = (unsigned long long)4096 << 10;
++  const unsigned long long max_kib = 1024ULL << 10;
+   const unsigned long long min_kib =
+       DYN_MIN_MIB << 10;
+   // The upper bound limits the POOL (in frames), not the room; the pool is

@@ -1,0 +1,39 @@
+{
+  "input_bytes": 1000000000,
+  "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+  "canonical_enwik9": true,
+  "block_bytes": 1048576,
+  "blocks": 954,
+  "encoding_workers": 4,
+  "recovered_blocks": 551,
+  "combined_encode_wall_seconds": 198.514,
+  "profiles": {
+    "DWX2": {
+      "stream_bytes": 255483667,
+      "sha256": "b50769adb2ac002f68077e97cffb5a2592169c412b9bbb737d6e1a23e40029ff",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "restored_bytes": 1000000000,
+      "byte_comparison": "equal",
+      "blocks_by_mode": [
+        0,
+        954
+      ],
+      "decode_compare_seconds": 99.808
+    },
+    "DWX3": {
+      "stream_bytes": 249751347,
+      "sha256": "33e92f200a59c49f6133c6d9605babb96c5a6fcd10af2bd795ba6084e91b8c0c",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "restored_bytes": 1000000000,
+      "byte_comparison": "equal",
+      "blocks_by_mode": [
+        0,
+        0,
+        0,
+        954,
+        0
+      ],
+      "decode_compare_seconds": 215.729
+    }
+  }
+}

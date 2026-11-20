@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
-"""Compare whole-file XZ, blocked XZ and DWX2. Read every recovered byte against the source."""
+"""Compare whole-file XZ, blocked XZ, DWX2, and DWX3. Read every recovered byte against the source."""
 import argparse
 import hashlib
 import json
@@ -12,6 +12,8 @@ import time
 
 from codec import encode
 from decoder import decode
+from wiki3 import encode_v3
+from wiki3_decoder import decode as decode_v3
 
 ENWIK9 = "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc"
 
@@ -35,12 +37,14 @@ class CompareOutput:
         return len(buf)
 
 
-def compare(source, dest):
+def compare(source, dest, profiles=("xz", "raw", "auto", "dwx3")):
     info = {"bytes": source.stat().st_size, "sha256": fingerprint(source)}
     dest.mkdir(parents=True, exist_ok=False)
     report = {"corpus": "enwik9" if info["sha256"] == ENWIK9 else source.name, "input": info,
               "python": sys.version.split()[0], "profiles": {}}
-    for mode, filename in (("xz", "continuous.xz"), ("raw", "blocked.dwx"), ("auto", "words.dwx")):
+    for mode, filename in (("xz", "continuous.xz"), ("raw", "blocked.dwx"), ("auto", "words.dwx"), ("dwx3", "words-v3.dwx")):
+        if mode not in profiles:
+            continue
         packed = dest / filename
         stats = {}
         start = time.monotonic()
@@ -50,7 +54,7 @@ def compare(source, dest):
                     shutil.copyfileobj(src, out, 1 << 20)
             else:
                 with packed.open("xb") as out:
-                    stats = encode(src, out, mode)
+                    stats = encode_v3(src, out) if mode == "dwx3" else encode(src, out, mode)
         encoded = time.monotonic()
         with source.open("rb") as expected:
             output = CompareOutput(expected)
@@ -59,7 +63,7 @@ def compare(source, dest):
                     shutil.copyfileobj(data, output, 1 << 20)
             else:
                 with packed.open("rb") as data:
-                    decode(data, output)
+                    (decode_v3 if mode == "dwx3" else decode)(data, output)
             if expected.read(1) or output.hash.hexdigest() != info["sha256"] or output.total != info["bytes"]:
                 raise ValueError(f"{mode} failed whole-file verification")
         finished = time.monotonic()
@@ -73,6 +77,8 @@ def compare(source, dest):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("input", type=Path)
-    p.add_argument("output", type=Path, help="new output directory for all three archives")
+    p.add_argument("output", type=Path, help="new output directory for all four archives")
+    p.add_argument("--profiles", nargs="+", choices=("xz", "raw", "auto", "dwx3"),
+                   default=("xz", "raw", "auto", "dwx3"))
     a = p.parse_args()
-    compare(a.input, a.output)
+    compare(a.input, a.output, a.profiles)
