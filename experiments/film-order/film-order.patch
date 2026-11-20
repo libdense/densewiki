@@ -1,0 +1,94 @@
+--- a/main.cpp
++++ b/main.cpp
+@@ -14,8 +14,9 @@
+ 
+ namespace dw {
+ constexpr unsigned use_words=8, use_topics=16, small_memory=32, shared_titles=64, fold_markup=128;
++constexpr unsigned group_films = 4096;
+ constexpr std::pair<View,unsigned> profiles[]={{"raw",0},{"words",8},{"fields",9},{"templates",11},{"topics",27},{"titles",91},{"wiki",219},{"lean",251},
+-    {"film",219|article_facts|only_film},{"facts",219|article_facts},
++    {"film-order",219|group_films},{"film-group",219|group_films|article_facts|only_film},{"film",219|article_facts|only_film},{"facts",219|article_facts},
+     {"links",219|article_links},{"article",219|article_modes},
+     {"facts-select",219|article_facts|selective_refs},{"links-select",219|article_links|selective_refs},
+     {"article-select",219|article_modes|selective_refs}};
+@@ -80,7 +81,7 @@
+     ArticleStats stats;
+     Bytes h = local ? "DWX5" : "DWX4";
+     h += static_cast<char>(mode & 255);
+-    if (local) h += static_cast<char>(mode >> 8);
++    if (local) h += static_cast<char>((mode & ~group_films) >> 8);
+     h+=le(raw_length,8);put_var(h,v.size());
+     for(auto &word:v){h+=static_cast<char>(word.size());h+=word;}
+     write_file(tape,h);
+@@ -128,7 +129,7 @@
+     };
+     if(mode&use_topics){
+         auto second=open_file(name,"rb");
+-        topic_windows(f.get(),second.get(),[&](const Bytes &info){Bytes hdr="P";put_var(hdr,info.size());write_file(tape,hdr);write_file(tape,info);},consume,block);
++        topic_windows(f.get(),second.get(),[&](const Bytes &info){Bytes hdr="P";put_var(hdr,info.size());write_file(tape,hdr);write_file(tape,info);},consume,block,mode & group_films);
+     }else{
+         std::array<char,65536> piece{};
+         while(size_t n=std::fread(piece.data(),1,piece.size(),f.get()))consume(View(piece.data(),n));
+--- a/topics.hpp
++++ b/topics.hpp
+@@ -42,7 +42,33 @@
+         p.labels[p.label_count++]=id;--budget;
+     }
+ }
+-inline Page describe(View s,uint64_t offset) {
++inline bool has_film_box(View body) {
++    size_t i = 0;
++    while ((i = body.find("{{", i)) != View::npos) {
++        i += 2;
++        size_t j = i;
++        auto spaces = [&] {
++            while (j < body.size() && (body[j] == ' ' || body[j] == '_' || body[j] == '\t')) ++j;
++        };
++        spaces();
++        auto word = [&](View w) {
++            for (unsigned char c : w) {
++                if (j == body.size() || lower(static_cast<unsigned char>(body[j])) != c) return false;
++                ++j;
++            }
++            return true;
++        };
++        if (!word("infobox")) continue;
++        spaces();
++        if (!word("film")) continue;
++        spaces();
++        if (j < body.size() && (body[j] == '|' || body[j] == '}' || body[j] == '\n' || body[j] == '\r'))
++            return true;
++    }
++    return false;
++}
++
++inline Page describe(View s,uint64_t offset, bool group_films) {
+     Page p;p.offset=offset;p.length=static_cast<uint32_t>(s.size());
+     View name=between(s,"    <title>","</title>");
+     p.title=leading_key(name);
+@@ -51,6 +77,7 @@
+     if(body.starts_with("#REDIRECT")||body.starts_with("#redirect")||body.starts_with("#Redirect")){
+         p.family=1;p.title=leading_key(between(body,"[[","]]"));return p;
+     }
++    if(group_films && has_film_box(body)) {p.family=6;return p;}
+     if(body.find("median income")!=View::npos && body.find("population density")!=View::npos){
+         p.family=2;size_t comma=name.rfind(", ");
+         if(comma!=View::npos)p.primary=label_hash(name.substr(comma+2));
+@@ -103,7 +130,7 @@
+     require(std::fwrite(s.data(),1,s.size(),f)==s.size(),"file write failed");
+ }
+ template<class Plan,class Data,class Finish>
+-void topic_windows(FILE *scan, FILE *copy, Plan plan,Data consume,Finish finish) {
++void topic_windows(FILE *scan, FILE *copy, Plan plan,Data consume,Finish finish,bool group_films=false) {
+     std::vector<Page> pages;pages.reserve(window_records);
+     unsigned window=0;
+     Bytes chunk(scan_bytes,0),record;
+@@ -125,7 +152,7 @@
+             end=end==View::npos?n:end+1;
+             View span=slab.substr(pos,end-pos);
+             if(pages.size()==window_records || window+span.size()>window_bytes) flush();
+-            pages.push_back(describe(span,offset+pos));
++            pages.push_back(describe(span,offset+pos,group_films));
+             window+=span.size();pos=end;
+         }
+         offset+=n;

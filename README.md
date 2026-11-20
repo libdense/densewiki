@@ -1,78 +1,52 @@
-# DenseWiki v0.0.4
+# DenseWiki v0.0.5
 
-DenseWiki restores the canonical 1,000,000,000 bytes of enwik9 from a **202,901,735-byte DWX4 Wiki archive**. This saves 46,851,624 bytes (18.76%) against the runnable v0.0.3 DWX3 archive. The Lean profile uses a smaller dictionary and shorter blocks for faster restoration with less RAM.
+The hybrid restores the original 1,000,000,000 bytes of enwik9 from a **169,707,769-byte executable archive**. That saves 33,193,966 bytes (16.36%) against the released v0.0.4 DWX4 Wiki archive. It combines Marcus Woelk's cmix-neif 2.0 Wikipedia preprocessor with the continuous PPMd coder from DWX4 Wiki. The native preprocessor uses more time and RAM. The general-purpose CLI still defaults to Wiki.
 
-| Full enwik9 profile | Runnable bytes | Encode / standalone decode | Peak RSS, encode / standalone decode |
-|---|---:|---:|---:|
-| DWX4 Wiki | 202,901,735 | 132.457 / 119.419 s | 30.80 / 25.87 MiB |
-| DWX4 Lean | 238,629,600 | 114.514 / 32.157 s | 14.96 / 7.58 MiB |
+| Full enwik9 build | Runnable archive, bytes | Archive + compressor, bytes | Encode / restore | Peak RSS, encode / restore |
+|---|---:|---:|---:|---:|
+| v0.0.4 DWX4 Wiki | 202,901,735 | 203,015,143 | 137.2 / 135.3 s | 30.8 / 25.9 MiB |
+| v0.0.5 cmix-neif + PPMd | 169,707,769 | 170,001,938 | 376.7 / 228.2 s | 1,703.4 / 1,188.5 MiB |
 
-Both archives passed a byte-by-byte comparison with canonical enwik9. Each run used one logical CPU on an AMD EPYC 9V74. Encoding writes a seekable temporary file. The largest sampled temporary-file totals were 659,455,402 bytes for Wiki and 744,278,878 bytes for Lean. Output files are additional. Decoding writes directly to the destination's temporary sibling and publishes it on success. A disk-backed `TMPDIR` keeps the encoder's scratch file off a RAM filesystem.
+Both rows are fresh measurements on one logical CPU of an AMD EPYC 9V74. Peak RSS excludes the native preprocessor's unnamed files on the host's memory-backed /tmp. The research report measures those separately. Each archive restored the canonical SHA-256 and passed a full byte comparison. The hybrid archive includes the native transform program and the entropy coder. Its separate compressor is 294,169 bytes and includes the dictionary hints and the article-order residual. The decoder rebuilds the full word dictionary from the compressed Wikipedia representation.
 
-## Restore the download
-
-From the directory containing the chosen ZIP, use the matching archive. Both write the original Wikipedia XML. Use a new output filename.
+## Restore the hybrid download
 
 ```bash
-unzip densewiki-v0.0.4-enwik9-wiki.zip
-./enwik9-wiki.run enwik9
+python3 densewiki-v0.0.5-enwik9-hybrid.pyz enwik9
 sha256sum enwik9
 ```
 
-The Lean ZIP contains `enwik9-lean.run`. The expected output SHA-256 is `159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc`.
+Use a new output filename. The expected XML SHA-256 is `159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc`. The downloadable archive's own SHA-256 is `836850e1c4895b2d089d81f9e5927bc425b1f33f5f64bcb122d4bb84870d6aa8`.
 
-| Executable inside download | Bytes | SHA-256 |
-|---|---:|---|
-| enwik9-wiki.run | 202,901,735 | `7b1ed487c288c6250f749341171766d0f4dff7f2b8f4ef0cbea04d55dc0e8310` |
-| enwik9-lean.run | 238,629,600 | `e33c36e2a1e6d8bed0d1279de61ce17d2add67fed43a2a70eec64c1915925e71` |
+The x86-64 Linux download runs with Python 3.11+, libarchive.so.13 and the system C/C++ runtimes. The bundled native preprocessor needs x86-64-v3 (AVX2 and FMA). Both native helpers import glibc symbols through 2.34. The preprocessor also imports GLIBCXX_3.4.26. Set `TMPDIR` to an executable, disk-backed directory with several GiB available for intermediate files. The decoder creates and removes its own private work directory and publishes the restored file after verification.
 
-The executable includes the program, all file-specific vocabularies, page ordering, compressed data and a 16-byte trailer. The x86-64 Linux build uses the installed libarchive 3 runtime and system C/C++ libraries. Download ZIP metadata is additional. For another Linux installation, build the source below and use `./dwx4/dwx4 decode enwik9-wiki.run enwik9`.
-
-## Build, test and reproduce DWX4
-
-Run these commands from the extracted project with GCC 12 or later, C++20, GNU Make, the libarchive 3 runtime and Python 3.11+ for the test harness. The supplied native executable was built with GCC 14.2.0 on Debian 13. Its Linux symbol requirements include GLIBC_2.34 and GLIBCXX_3.4.29. The Makefile defines the supported GNU string ABI explicitly.
+## Reproduce the hybrid
 
 ```bash
 sha256sum -c --quiet SHA256SUMS
+python3 hybrid/build.py ../rebuilt-comp.pyz
+python3 hybrid/benchmark.py ../rebuilt-comp.pyz ../enwik9 ../hybrid-benchmark
+```
+
+Run these from the extracted project on Linux with GCC 12+ or a compatible C++20 compiler, libarchive.so.13 and Python 3.12+ (or Python 3.11 with tarfile extraction filters) for building. The compressor is already included at `release/hybrid/comp.pyz`. For a direct encode, run `python3 release/hybrid/comp.pyz ../enwik9 ../enwik9-hybrid.pyz`. This profile accepts the canonical enwik9 corpus. For other inputs, use the DWX4 CLI.
+
+## Reproduce the article experiments
+
+```bash
 make -B -C dwx4
 make -C dwx4 test
-python3 tools/test_native_addresses.py
-mkdir -p ../densewiki-tmp
-python3 dwx4/benchmark.py ../enwik9 ../wiki-bench --profile wiki --scratch ../densewiki-tmp
-python3 dwx4/benchmark.py ../enwik9 ../lean-bench --profile lean --scratch ../densewiki-tmp
+python3 tools/film_sample.py ../enwik9 ../film-pages.xml
+python3 dwx4/test.py dwx4/dwx4 --film-sample ../film-pages.xml
+python3 dwx4/benchmark.py ../film-pages.xml ../film-pilot --profile film
+python3 dwx4/benchmark.py ../enwik9 ../fact-bench --profile facts
+python3 dwx4/benchmark.py ../enwik9 ../link-bench --profile links
+python3 dwx4/benchmark.py ../enwik9 ../combined-bench --profile article
 ```
 
-The benchmark records a fresh encode, packaging, standalone decode, memory, scratch-file use, hashes and a byte comparison. Each output directory contains `verified.json`, the stream, the runnable archive and the restored file. Compilers and libarchive versions can change executable or stream bytes. The CLI also handles arbitrary binary files. The earlier Python CLI under `experiments/wiki-words/` remains available for DWX2 and DWX3 archives.
+The film-only sample saved 22,972 bytes from infobox references. On all of enwik9, each tested article-local version grew the Wiki stream. The new profiles are opt-in. The research report gives the size of every complete stream, including those tradeoffs. The native Size and Prize candidates from v0.0.4 remain under `release/size` and `release/prize`.
 
-```bash
-./dwx4/dwx4 encode input.bin output.dwx wiki
-./dwx4/dwx4 decode output.dwx restored.bin
-cmp input.bin restored.bin
-./dwx4/dwx4 pack output.dwx example.run
-```
+[Measurements and interpretation](RESEARCH.md) | [Machine-readable results](results/enwik9-v0.0.5.json) | [DWX4 and DWX5 formats](dwx4/FORMAT.md) | [v0.0.4 results and native build instructions](HISTORY-v0.0.4.md).
 
-## Sub-100 MB native profiles
+## Credits
 
-| Profile | archive9 | comp9 | Combined | Combined saving vs v0.0.3 |
-|---|---:|---:|---:|---:|
-| Size, derived from Ex-Girlfriend 2.0 | 88,982,491 | 4,056,498 | 93,038,989 | 622 |
-| Prize candidate, derived from cmix-neif 2.0 | 89,345,759 | 4,041,931 | 93,387,690 | 622 |
-
-Both pairs are present under `release/size/` and `release/prize/`. Each uses a 7,286-byte startup block. Full inner executable images, complete model and Wikipedia payloads and both startup entry points were checked. The prize decoder also matched the upstream decoder for 65,536 model-stream bytes before inverse Wikipedia preprocessing. Full-corpus native encode/decode runs remain open. The measured DWX4 times in the first table apply only to those two lightweight profiles.
-
-```bash
-python3 tools/materialize.py size ../original-size --original
-python3 tools/build.py size ../original-size ../rebuilt-size
-cmp release/size/archive9 ../rebuilt-size/archive9
-python3 tools/materialize.py prize ../original-prize --original
-python3 tools/build.py prize ../original-prize ../rebuilt-prize
-cmp release/prize/archive9 ../rebuilt-prize/archive9
-```
-
-The long-run harness for a suitably provisioned x86-64-v3 Linux host is `python3 tools/roundtrip.py prize ../enwik9 ../prize-roundtrip`. It verifies the canonical input, regenerated archive, restored output and complete byte comparison. Use `size` and a separate directory for the other profile.
-
-The research report includes full-corpus ablations and the experiments that lost bytes. The JSON receipt contains exact timings and checked hashes. [Research](RESEARCH.md) | [Benchmark](results/enwik9-v0.0.4.json) | [DWX4 format](dwx4/FORMAT.md).
-
-## Attribution
-
-DenseWiki's DWX4 transformations use GPL-3.0-only. The entropy coders come from libarchive's PPMd implementation and liblzma. The two native Wikipedia models derive from Ryan Landay's Ex-Girlfriend 2.0 and Marcus Woelk's cmix-neif 2.0. The scientific and implementation credits, upstream source packages, dataset notices and earlier research are included. [Native notices](upstream/EX2-NOTICE.md) | [Training attribution](upstream/TRAINING-ATTRIBUTION.md) | [Wikipedia license](upstream/CC-BY-SA-4.0.txt).
+DenseWiki's article transforms and hybrid driver are GPL-3.0-only. The new driver calls cmix-neif 2.0's file stages in upstream order, including its deterministic census arithmetic. DWX4 uses libarchive's PPMd implementation. The supplied upstream source package, original notices, Wikipedia attribution and license texts accompany this release. [Native credits](upstream/EX2-NOTICE.md) | [Training attribution](upstream/TRAINING-ATTRIBUTION.md) | [License](LICENSE).

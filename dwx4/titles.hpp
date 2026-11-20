@@ -57,6 +57,12 @@ class PageTitle {
         update(line);
     }
 public:
+    void observe(View line) { update(line); }
+    bool would_replace(View value) const {
+        for (const auto &name : names)
+            if (!name.empty() && value.find(name) != View::npos) return true;
+        return false;
+    }
     Bytes encode(View data,uint64_t &refs) {
         Bytes out;out.reserve(data.size());
         for(size_t i=0;i<data.size();) {

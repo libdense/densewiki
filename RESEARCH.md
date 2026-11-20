@@ -1,56 +1,83 @@
-# DenseWiki v0.0.4 measurements
+# DenseWiki v0.0.5 experiments
 
-## What the book predicted correctly
+## Native preprocessing with fast PPMd
 
-Chapter 38 of Merlin Numa's *Dense-Region MMO Server Architecture* separates a reusable body from per-recipient details. Chapter 39 groups fields that change together. The libdense 0.4.4 research note on factored worksets retains one shared base plus exact exceptions. DWX4 applies these ideas to Wikipedia pages. When two census sentences have identical text around different numbers, the decoder reuses the whole sentence pattern and inserts the exact digit strings. A title such as `Lake Example (river)` can also supply `Lake Example` or its initial-lowercase variant. The compression transcript's deterministic replay principle applies to the numeric template cache. The stored row order and actual equality comparison are enough for both sides to recreate the same state.
+The upstream intermediate contains 501,062,281 bytes. Its SHA-256 is `c35d3073eeba70f22a2e08a50202b53eb95466e3e9f1f2702f6f9b3f96fd8718`. Its length and first 16 hexadecimal hash digits match the upstream training manifest. Its first 65,536 bytes also match the earlier independent prefix decoded from the native Prize archive. Replacing the expensive predictor with DWX4 Wiki's PPMd coder produced the following sizes.
 
-In the final Wiki run, the encoder used 1,824,403 title references. Its 613,332 numeric-template hits covered 103,811,079 bytes of title-transformed line content. That coverage counts the lengths of matching lines. The measured compressed-byte contribution is in the table.
+| Item | Bytes |
+|---|---:|
+| Preprocessed Wikipedia | 501,062,281 |
+| Solid 7z member and container | 169,501,273 |
+| Decoder programs, launcher and packaging in the archive | 206,496 |
+| Runnable hybrid archive | 169,707,769 |
+| Separate complete compressor | 294,169 |
+| Archive plus compressor | 170,001,938 |
 
-## Full-corpus ablation
+The word dictionary, contributor names and reconstruction data travel in the transformed stream or in the charged program. Decompression reconstructs the dictionary from its stored article and restores the page order from the recovered page IDs. The 47,166-byte hint file and 40,694-byte article-order residual are encoder inputs. Their compressed entries, metadata and all extractor code are counted in the separate compressor. No trained model weights are used. The public decoder ran in a fresh working directory with the archive and system runtimes as its inputs.
 
-| Step | Complete stream bytes | Saved at this step |
+| Build | Runnable archive, bytes | Archive + compressor, bytes | Encode / restore | Peak RSS, encode / restore |
+|---|---:|---:|---:|---:|
+| v0.0.4 DWX4 Wiki | 202,901,735 | 203,015,143 | 137.2 / 135.3 s | 30.8 / 25.9 MiB |
+| v0.0.5 cmix-neif + PPMd | 169,707,769 | 170,001,938 | 376.7 / 228.2 s | 1,703.4 / 1,188.5 MiB |
+
+The combined saving is 33,013,205 bytes after charging both distinct executables. Timings include input/output and scratch I/O. The hybrid checks the XML and intermediate hashes inside the measured commands. DWX4 packages its runnable archive in a separate 0.151-second step. Independent verification ran outside the timers. Each command and its workers shared one logical CPU. Peak RSS is the Linux high-water mark for the largest individual process. Shared libraries, file cache and temporary files have different accounting.
+
+The entropy coder alone was timed separately on the exact 501,062,281-byte representation. Packing reproduced the same 7z payload and unpacking reproduced the same intermediate SHA-256.
+
+| PPMd alone | Seconds | Peak RSS, MiB |
 |---|---:|---:|
-| Original XML, same framed PPMd backend | 219,177,276 | Baseline |
-| One corpus-wide word table and case/space rules | 209,164,230 | 10,013,046 |
-| XML fields and link-language rows | 208,534,385 | 629,845 |
-| Exact numeric templates | 208,362,910 | 171,475 |
-| Page order by shared topics | 205,874,624 | 2,488,286 |
-| Page-title references | 203,506,076 | 2,368,548 |
-| Wiki markup spellings | 202,788,311 | 717,765 |
+| pack | 95.9 | 18.5 |
+| unpack | 107.5 | 18.6 |
 
-Every row used a single continuous PPMd member and restored all 1,000,000,000 bytes. Each row adds to the previous configuration. Page order changes which sentences reach the numeric cache, so these marginal effects depend on the order of the experiment. The complete representation saves **16,388,965 stream bytes** over framed raw PPMd. A separate unframed libarchive control stored raw enwik9 in 219,169,689 bytes including its 7z container. The comparison with the v0.0.3 runnable archive combines the new representation, backend and executable packaging.
+The total command times above use process start and completion. Named scratch files in the hybrid's private directory reached 1,997,625,963 bytes during encode and 1,999,799,005 during restore. The sampler excludes unnamed temporary files and the destination. These are observed lower bounds on total disk use.
 
-The handoff specifically asked whether v0.0.3 lost bytes by resetting XZ history. We extracted the actual LZMA2 members of all 954 shipped DWX3 blocks. The same 720,286,803 transformed bytes with a one-MiB dictionary used 249,684,076 independent raw LZMA2 bytes and 240,740,752 continuous bytes. The saving was **8,943,324 bytes**. These counts exclude DWX3 headers and XZ container overhead. Both paths restored the same transformed-byte hash. This separate control uses the older DWX3 representation. Its saving cannot be added to the DWX4 ladder.
+On this host `/tmp` is tmpfs. The upstream C library calls for unnamed temporary files use that mount even with the wrapper's named scratch on disk. Two additional native-stage runs sampled allocated blocks of open, unlinked files on that device every 50 ms. Process RSS alone omits that storage. The last column is the largest simultaneous sample of process RSS plus allocated tmpfs file bytes. It excludes disk-backed page cache.
+
+| Native stage | Peak unnamed /tmp files, MiB | Peak simultaneous RSS + unnamed /tmp, MiB |
+|---|---:|---:|
+| forward | 775.6 | 1,703.5 |
+| inverse | 0.0 | 1,188.6 |
 
 ```bash
-python3 experiments/wiki-words/history_control.py ../densewiki-v0.0.3-enwik9-lowmem.pyz
+python3 hybrid/scratch_audit.py release/hybrid/comp.pyz --xml ../enwik9
+python3 hybrid/scratch_audit.py ../densewiki-v0.0.5-enwik9-hybrid.pyz
 ```
 
-## Which alternatives lost
+## Infobox facts and repeated link targets
 
-A separate paid dictionary of full wikilink targets emitted 2,597,413 references but grew the Wiki stream from 202,788,311 to 203,266,235 bytes, a cost of 477,924 bytes. The shipped vocabulary codes repeat words cheaply already. A high hit count alone gave the wrong decision.
+The shared-payload idea in Chapter 38 of Merlin Numa's *Dense-Region MMO Server Architecture* suggests a direct Wikipedia test. Once a film infobox has spelled out a director, the decoder can copy those exact bytes wherever the name recurs later in the page. A short reference still costs something under PPMd. We measured that cost on 1,118 complete film pages (9,162,172 bytes) and on the full dump using the same coder. In *Jaws (film)*, the exact spelling `Steven Spielberg` occurs eight times after the infobox.
 
-A block-local LZP pass used the last position following four bytes to copy matching passages without sending an offset. On the 8 MiB prefix, a minimum copy of eight bytes grew the word-and-row pilot from 2,082,085 to 2,109,675 bytes. At 64 bytes, the prefix saved 533 bytes, while the middle and late samples grew by 231 and 212 bytes respectively. Prefix, middle and late start at byte offsets 0, 429,000,000 and 903,000,000. The shipped design omits this pass.
+The film selector preserves original XML and page order. Its SHA-256 is `3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4`. The broad facts profile also tries cast, writers, places, dates, and selected taxonomic fields. Box counters refer to recognized template occurrences. A page can contain several. The link profile keeps the last 32 distinct exact targets in most-recently-used order. On replacement it reproduces a plain or piped link, including its delimiters. Capacity, input fragments and malformed target rules affect the number of usable references.
 
-The Lean branch also tried LZMA2 levels 2 and 3 on the same earlier 8,192-word, 256 KiB representation before title and markup substitutions. Level 1 used 245,257,125 stream bytes, level 2 used 238,861,539, and level 3 used 234,366,056. Encoder RSS rose from 18.36 MiB to 25.86 MiB and 40.86 MiB in those trials. The release keeps level 1 and gains additional bytes through title and markup reuse. All three experimental streams passed full comparisons.
+| Profile | Full stream, bytes | Change vs Wiki | Film stream, bytes | Change vs film Wiki | Full fact references | Full link references |
+|---|---:|---:|---:|---:|---:|---:|
+| wiki | 202,788,311 | +0 | 2,072,961 | +0 | 0 | 0 |
+| film | 202,797,615 | +9,304 | 2,049,989 | -22,972 | 26,115 | 0 |
+| facts | 202,822,238 | +33,927 | 2,050,169 | -22,792 | 200,965 | 0 |
+| links | 203,293,397 | +505,086 | 2,064,558 | -8,403 | 0 | 809,860 |
+| article | 203,324,839 | +536,528 | 2,051,083 | -21,878 | 200,965 | 788,773 |
+| facts-select | 202,806,553 | +18,242 | 2,051,759 | -21,202 | 56,137 | 0 |
+| links-select | 202,998,672 | +210,361 | 2,074,555 | +1,594 | 0 | 114,684 |
+| article-select | 203,001,777 | +213,466 | 2,052,913 | -20,048 | 56,137 | 112,734 |
 
-## Actual memory and runtime
+A positive change means a larger stream. Each row restores its input exactly. Packaging adds 133,952 bytes to every released article CLI stream, including the complete executable and trailer. Every archive was also tested through its standalone entry point. The low-memory baseline stream has the same SHA-256 as v0.0.4 Wiki.
 
-| Released executable archive | Bytes with program | Encode seconds | Standalone decode seconds | Peak RSS encode / decode |
-|---|---:|---:|---:|---:|
-| Wiki | 202,901,735 | 132.457 | 119.419 | 30.80 / 25.87 MiB |
-| Lean | 238,629,600 | 114.514 | 32.157 | 14.96 / 7.58 MiB |
+The broad link pass emitted 809,860 exact references. Numeric-template hits fell from 613,332 to 559,831. DWX4 excludes lines containing a literal NUL from its numeric templates, and the new link token uses that byte. The selective pass preserves eligible numeric lines and only substitutes targets of at least 16 bytes. It reduced the link penalty to 210,361 bytes. Infobox references can also displace an existing one-byte page-title substitution. The selective facts pass skips short values and spellings the title coder already predicts. Its full stream still grew by 18,242 bytes.
 
-The release runs used GCC 14.2.0, libarchive 3.7.4 and Linux 6.18.57 on an AMD EPYC 9V74. Each process was pinned to one logical CPU. Other work used other logical CPUs. Encode and standalone decode times include file I/O and exclude verification. The runnable adds 113,424 bytes to either stream, including its trailer. The v0.0.3 benchmark recorded 339.824 s and 30.01 MiB for its CLI encode and 172.240 s and 16.00 MiB for its CLI decode. Those historical timings are stream measurements. Peak RSS excludes the filesystem cache. The final encodes used seekable scratch files on a disk-backed filesystem, while decode sought directly within its eventual output file.
+On film pages alone, shared facts cut the stream by 22,972 bytes (1.11%). In the full dump, the film-only rule grew the stream by 9,304 bytes. A separate control grouped film pages inside each existing reorder window. Grouping alone produced 202,813,746 stream bytes. With film facts it produced 202,828,774, another 15,028 bytes. Both restored the complete canonical input. The optional patch reproduces those two comparisons.
 
-A separate Lean decode with a small C launcher reported 6.94 MiB peak RSS and 31.270 seconds, with a complete byte comparison. The Python harness's fork can set a pre-exec high-water floor in the main table's Linux wait4 figures. All memory and time figures in this release concern these specific runs.
+```bash
+cp -a dwx4 ../film-order-build
+patch --batch -d ../film-order-build -p1 < experiments/film-order/film-order.patch
+make -B -C ../film-order-build
+python3 dwx4/benchmark.py ../enwik9 ../grouping-control --binary ../film-order-build/dwx4 --profile film-order
+python3 dwx4/benchmark.py ../enwik9 ../grouping-with-facts --binary ../film-order-build/dwx4 --profile film-group
+```
 
-As one historical size reference, Matt Mahoney lists Boa 0.58b at 213,901,294 bytes including its program and about 17 MB of compression memory. His memory column is approximate and excludes temporary files. This is a published size comparison across different implementations and hosts. [Large Text Compression Benchmark](https://mattmahoney.net/dc/text.html).
+## Verification
 
-## Native builds
+The hybrid was built twice from the bundled sources. Its independently generated archive matched byte for byte. Full enwik9 restored to `159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc`. The published archive's SHA-256 is `836850e1c4895b2d089d81f9e5927bc425b1f33f5f64bcb122d4bb84870d6aa8`. The compressor's SHA-256 is `b533780aee02e20ddb72dc053c2cc9118881b15c4ab09cb82fde8b8f8c773e61`.
 
-A 32-bit displacement depends on where an instruction sits. The startup transform stores eligible signed 27-bit operands in a common image coordinate system before entropy coding and reconstructs the original displacements before execution. The flat 12,311-byte image contained 500 recognized operand shapes, representing 494 distinct original displacements and 166 distinct normalized values. Recognition is a reversible byte-pattern rule. It does not require an instruction disassembler.
+The CLI passed 150 fixture/profile round trips plus tests for the 32-target eviction boundary, nested templates, literal marker bytes, page/frame boundaries, damaged inputs, existing destinations and executable archives. Old and new CLIs also read each other's regular Wiki stream of the complete *Jaws (film)* page. The general facts film-sample stream exposed a libarchive read-size issue. With 64 KiB compressed-input chunks the system library reported truncated data. Reading the same bytes contiguously restored all 9,162,172 sample bytes. The released reader retries this case without changing the archive or skipping any CRC check. The full-corpus article streams were repackaged and byte-compared with this released reader. The original native Size and Prize archives retain their v0.0.4 validation status.
 
-The new mixer policy used 6,399 coded bytes for that flat image. The previous policy used 6,841. Including the inverse transform and model, the startup fell from 7,597 to 7,286 bytes. Both the compressor and the archive carry it, saving 622 combined bytes per profile. The complete compressed Wikipedia streams were identical to the respective parent streams, 85,039,910 bytes for Size and 85,417,870 bytes for Prize. The fresh native checks compare complete program images, suffixes, weights, payloads and decoder-prefix generation. The prize decoder reproduced 65,536 upstream model-stream bytes. Original XML and regenerated archive from a fresh multi-day native run remain unverified for these two builds.
-
-[Native size checks](results/native-checks.json) | [Prize checks](results/native-checks-prize.json) | [Prize prefix](results/native-model-prefix-prize.json) | [Address counts](results/native-addresses.json).
+[Detailed JSON](results/enwik9-v0.0.5.json) | [Previous full-corpus benchmark](results/enwik9-v0.0.4.json).

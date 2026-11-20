@@ -40,9 +40,9 @@ def temporary_bytes(pid):
                 info = fd.stat()
                 if stat.S_ISREG(info.st_mode):
                     files[info.st_dev, info.st_ino] = info.st_size
-            except FileNotFoundError:
+            except (FileNotFoundError, PermissionError, ProcessLookupError):
                 continue
-    except FileNotFoundError:
+    except (FileNotFoundError, PermissionError, ProcessLookupError):
         pass
     return sum(files.values())
 

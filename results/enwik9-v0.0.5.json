@@ -1,0 +1,1100 @@
+{
+  "release": "DenseWiki v0.0.5",
+  "dataset": "enwik9",
+  "date": "2026-11-20",
+  "input_bytes": 1000000000,
+  "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+  "machine": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "kernel": "6.18.57",
+    "compiler": "GCC 14.2.0",
+    "libarchive": "3.7.4",
+    "platform": "x86-64 Linux"
+  },
+  "measurement": "Each codec used one pinned logical CPU. Times include file I/O. The hybrid command verifies hashes and packages its archive during encode. For DWX4 the encode and pack stages are timed separately. Some independent trials shared the host on other cores. External byte comparisons are excluded. Archive means a directly runnable file with its decoder. Archive plus compressor counts both complete files. System runtime libraries and Python for the hybrid are external.",
+  "hybrid": {
+    "profile": "cmix-neif 2.0 preprocessing + DWX4 Wiki PPMd",
+    "input_bytes": 1000000000,
+    "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "byte_comparison": true,
+    "canonical_enwik9": true,
+    "intermediate_bytes": 501062281,
+    "intermediate_sha256": "c35d3073eeba70f22a2e08a50202b53eb95466e3e9f1f2702f6f9b3f96fd8718",
+    "ppmd_member_with_7z_container_bytes": 169501273,
+    "archive_bytes": 169707769,
+    "archive_sha256": "836850e1c4895b2d089d81f9e5927bc425b1f33f5f64bcb122d4bb84870d6aa8",
+    "decoder_and_packaging_bytes": 206496,
+    "compressor_bytes": 294169,
+    "compressor_sha256": "b533780aee02e20ddb72dc053c2cc9118881b15c4ab09cb82fde8b8f8c773e61",
+    "archive_plus_compressor_bytes": 170001938,
+    "members": {
+      "comp.pyz": {
+        "__main__.py": {
+          "size": 3961,
+          "stored_bytes": 1579
+        },
+        "transform": {
+          "size": 379720,
+          "stored_bytes": 197388
+        },
+        "ppmd": {
+          "size": 23128,
+          "stored_bytes": 7112
+        },
+        ".hints": {
+          "size": 47166,
+          "stored_bytes": 46860
+        },
+        ".new_article_order": {
+          "size": 40694,
+          "stored_bytes": 40709
+        }
+      },
+      "enwik9-hybrid.pyz": {
+        "__main__.py": {
+          "size": 3961,
+          "stored_bytes": 1579
+        },
+        "transform": {
+          "size": 379720,
+          "stored_bytes": 197388
+        },
+        "ppmd": {
+          "size": 23128,
+          "stored_bytes": 7112
+        },
+        "payload.7z": {
+          "size": 169501273,
+          "stored_bytes": 169501273
+        }
+      }
+    },
+    "cpu": 0,
+    "kernel": "6.18.57",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "encode": {
+      "wall_seconds": 376.674,
+      "user_seconds": 325.49,
+      "system_seconds": 43.747,
+      "peak_rss_kib": 1744236,
+      "sampled_named_scratch_bytes": 1997625963,
+      "worker_samples": {}
+    },
+    "standalone_decode": {
+      "wall_seconds": 228.179,
+      "user_seconds": 179.948,
+      "system_seconds": 27.023,
+      "peak_rss_kib": 1217052,
+      "sampled_named_scratch_bytes": 1999799005,
+      "worker_samples": {}
+    },
+    "measurement": "Wall times include validation inside the public CLI, scratch I/O and executable packaging. External comparisons are excluded. Each command and its sequential workers shared one pinned logical CPU. Linux wait4 peak RSS is the highest individual process in the waited tree, including workers. Worker spans and per-worker high-water marks were sampled about every 100 ms. Named scratch samples exclude unnamed files, output and filesystem cache."
+  },
+  "v004_wiki_control": {
+    "profile": "wiki",
+    "cpu": 0,
+    "machine": "x86_64",
+    "kernel": "6.18.57",
+    "executable_sha256": "78fb96ddda4b2679c46dc20ff8435ad6690b687c5bab98a3c0e2acad5d3e0a03",
+    "input_bytes": 1000000000,
+    "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "encode": {
+      "wall_seconds": 137.212,
+      "peak_rss_kib": 31532,
+      "user_seconds": 127.689,
+      "system_seconds": 6.517,
+      "sampled_temporary_file_bytes": 659455402
+    },
+    "pack": {
+      "wall_seconds": 0.151,
+      "peak_rss_kib": 7784,
+      "user_seconds": 0.012,
+      "system_seconds": 0.092,
+      "sampled_temporary_file_bytes": 0
+    },
+    "standalone_decode": {
+      "wall_seconds": 135.278,
+      "peak_rss_kib": 26484,
+      "user_seconds": 129.753,
+      "system_seconds": 4.737,
+      "sampled_temporary_file_bytes": 0
+    },
+    "stream_bytes": 202788311,
+    "stream_sha256": "8ac8b64afab406b2acabe406c0d9b7f04f792dd18035f9a7894af92f1e6b2c86",
+    "archive_bytes": 202901735,
+    "archive_sha256": "7b1ed487c288c6250f749341171766d0f4dff7f2b8f4ef0cbea04d55dc0e8310",
+    "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+    "byte_comparison": true,
+    "canonical_enwik9": true,
+    "decoder_and_trailer_bytes": 113424
+  },
+  "ppmd_only": {
+    "pack": {
+      "wall_seconds": 95.941,
+      "peak_rss_kib": 18944,
+      "user_seconds": 93.576,
+      "system_seconds": 1.329,
+      "sampled_temporary_file_bytes": 169501241,
+      "output_sha256": "1e2e95fe7ffd4195ffafa86e85e605dc4620e604f92bde3fac0aceec92b1f289"
+    },
+    "unpack": {
+      "wall_seconds": 107.485,
+      "peak_rss_kib": 19072,
+      "user_seconds": 105.94,
+      "system_seconds": 1.377,
+      "sampled_temporary_file_bytes": 0,
+      "output_sha256": "c35d3073eeba70f22a2e08a50202b53eb95466e3e9f1f2702f6f9b3f96fd8718"
+    }
+  },
+  "native_scratch_audit": {
+    "method": "Separate native-stage repeats, 50 ms samples. VmRSS is process residency. Unlinked /tmp bytes are allocated blocks of distinct open files on the /tmp tmpfs device. The combined peak is the largest sum seen in a single sample. File cache on disk-backed mounts and other processes are excluded.",
+    "forward": {
+      "direction": "forward",
+      "output_sha256": "c35d3073eeba70f22a2e08a50202b53eb95466e3e9f1f2702f6f9b3f96fd8718",
+      "cpu": 7,
+      "open_unlinked_allocated_bytes": 813252608,
+      "open_unlinked_tmp_allocated_bytes": 813252608,
+      "rss_plus_tmp_allocated_bytes": 1786224640,
+      "observed_rss_bytes": 1786224640
+    },
+    "inverse": {
+      "direction": "inverse",
+      "output_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu": 8,
+      "open_unlinked_allocated_bytes": 0,
+      "open_unlinked_tmp_allocated_bytes": 0,
+      "rss_plus_tmp_allocated_bytes": 1246351360,
+      "observed_rss_bytes": 1246351360
+    }
+  },
+  "archive_saving_bytes": 33193966,
+  "archive_saving_percent": 16.35963,
+  "v004_archive_plus_compressor_bytes": 203015143,
+  "combined_saving_bytes": 33013205,
+  "intermediate_crosscheck": {
+    "bundled_cmix_neif_manifest_sha256_prefix": "c35d3073eeba70f2",
+    "upstream_training_manifest_record": "training/MANIFEST.tsv, REF:coder stream",
+    "first_65536_bytes_sha256": "b05e38eaacf2e8cee809d1f8d03cf75ec478937cefc518f81dd45f320b332f34",
+    "reference": "results/native-model-prefix-prize.json",
+    "independent_compressor_rebuild_byte_equal": true,
+    "independent_hybrid_archive_byte_equal": true
+  },
+  "article_full_corpus": {
+    "wiki": {
+      "profile": "wiki",
+      "cpu": 1,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 190.567,
+        "peak_rss_kib": 31672,
+        "user_seconds": 164.288,
+        "system_seconds": 4.62,
+        "sampled_temporary_file_bytes": 659455402
+      },
+      "pack": {
+        "wall_seconds": 1.883,
+        "peak_rss_kib": 9484,
+        "user_seconds": 0.087,
+        "system_seconds": 1.131,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 178.001,
+        "peak_rss_kib": 26488,
+        "user_seconds": 150.818,
+        "system_seconds": 4.377,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 202788311,
+      "stream_sha256": "8ac8b64afab406b2acabe406c0d9b7f04f792dd18035f9a7894af92f1e6b2c86",
+      "archive_bytes": 202922263,
+      "archive_sha256": "6191fe9a32c37b1793092c34c0700f2f372954b856dede4d4f2540c9317b2da4",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613332,
+        "matched_source_bytes": 103811079,
+        "title_refs": 1824403
+      }
+    },
+    "film": {
+      "profile": "film",
+      "cpu": 5,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 144.769,
+        "peak_rss_kib": 30232,
+        "user_seconds": 138.301,
+        "system_seconds": 4.57,
+        "sampled_temporary_file_bytes": 659391206
+      },
+      "pack": {
+        "wall_seconds": 1.832,
+        "peak_rss_kib": 9476,
+        "user_seconds": 0.04,
+        "system_seconds": 1.323,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 174.899,
+        "peak_rss_kib": 27800,
+        "user_seconds": 149.948,
+        "system_seconds": 4.488,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 202797615,
+      "stream_sha256": "b42ec03d178bdc88044880f40bf21003773165330e77d59e9e86909aa9139070",
+      "archive_bytes": 202931567,
+      "archive_sha256": "463f0a70baaf1279393dbb47f6708d63814a2b80e724552db9b4ff85f995296e",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613299,
+        "matched_source_bytes": 103809451,
+        "title_refs": 1815625,
+        "boxes": 1125,
+        "film_boxes": 1125,
+        "fact_refs": 26115,
+        "film_fact_refs": 26115,
+        "link_refs": 0
+      }
+    },
+    "facts": {
+      "profile": "facts",
+      "cpu": 2,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 195.281,
+        "peak_rss_kib": 32688,
+        "user_seconds": 166.089,
+        "system_seconds": 4.205,
+        "sampled_temporary_file_bytes": 659279540
+      },
+      "pack": {
+        "wall_seconds": 1.888,
+        "peak_rss_kib": 9588,
+        "user_seconds": 0.059,
+        "system_seconds": 1.346,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 176.984,
+        "peak_rss_kib": 27912,
+        "user_seconds": 149.934,
+        "system_seconds": 4.57,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 202822238,
+      "stream_sha256": "015a7ce557c85fe144c7609451596bf346ea7d584ed5b8c51441befecebeb6fe",
+      "archive_bytes": 202956190,
+      "archive_sha256": "25d92c5ca66134e49514903212efb9342aab85ab2b1c951c3a8688117815660e",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613129,
+        "matched_source_bytes": 103800856,
+        "title_refs": 1721222,
+        "boxes": 15068,
+        "film_boxes": 1125,
+        "fact_refs": 200965,
+        "film_fact_refs": 25921,
+        "link_refs": 0
+      }
+    },
+    "links": {
+      "profile": "links",
+      "cpu": 3,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 192.481,
+        "peak_rss_kib": 32268,
+        "user_seconds": 165.221,
+        "system_seconds": 4.02,
+        "sampled_temporary_file_bytes": 665417687
+      },
+      "pack": {
+        "wall_seconds": 1.885,
+        "peak_rss_kib": 9492,
+        "user_seconds": 0.074,
+        "system_seconds": 1.3,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 179.718,
+        "peak_rss_kib": 28424,
+        "user_seconds": 152.01,
+        "system_seconds": 4.952,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 203293397,
+      "stream_sha256": "a3da3fec38b8d65564edaaa728f9c9fcc031fbc2b2b58022456d6f064d2d1d9a",
+      "archive_bytes": 203427349,
+      "archive_sha256": "040504329cfef24b077fb915defd0b705dc0f3eb501f829844eb45643b5643a9",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 559831,
+        "matched_source_bytes": 77133457,
+        "title_refs": 1808338,
+        "boxes": 0,
+        "film_boxes": 0,
+        "fact_refs": 0,
+        "film_fact_refs": 0,
+        "link_refs": 809860
+      }
+    },
+    "article": {
+      "profile": "article",
+      "cpu": 4,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 199.315,
+        "peak_rss_kib": 29416,
+        "user_seconds": 167.151,
+        "system_seconds": 4.482,
+        "sampled_temporary_file_bytes": 665378363
+      },
+      "pack": {
+        "wall_seconds": 1.935,
+        "peak_rss_kib": 9512,
+        "user_seconds": 0.052,
+        "system_seconds": 0.993,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 181.973,
+        "peak_rss_kib": 30472,
+        "user_seconds": 155.22,
+        "system_seconds": 4.542,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 203324839,
+      "stream_sha256": "8dfedab13bbd9572b14b7dae6102ea796b17f563cb9faa98d478d496290eb000",
+      "archive_bytes": 203458791,
+      "archive_sha256": "f0b561edc837ace0171327fd89615a80156f57848cf1c878db5a3299931e50bc",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 559628,
+        "matched_source_bytes": 77120660,
+        "title_refs": 1706648,
+        "boxes": 15068,
+        "film_boxes": 1125,
+        "fact_refs": 200965,
+        "film_fact_refs": 25921,
+        "link_refs": 788773
+      }
+    },
+    "facts-select": {
+      "profile": "facts-select",
+      "cpu": 6,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 198.504,
+        "peak_rss_kib": 30208,
+        "user_seconds": 166.451,
+        "system_seconds": 4.479,
+        "sampled_temporary_file_bytes": 659213230
+      },
+      "pack": {
+        "wall_seconds": 1.928,
+        "peak_rss_kib": 9496,
+        "user_seconds": 0.075,
+        "system_seconds": 1.242,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 220.923,
+        "peak_rss_kib": 27908,
+        "user_seconds": 159.761,
+        "system_seconds": 5.234,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 202806553,
+      "stream_sha256": "464bda62da4f6e938c6d453a5161252e27d1be6e9d8d9230a585b56c7ba2ea40",
+      "archive_bytes": 202940505,
+      "archive_sha256": "b61a1db592fb6d57b160fffed06787e14e6802a8ce1dcc6ae209957094785e62",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613332,
+        "matched_source_bytes": 103811349,
+        "title_refs": 1821624,
+        "boxes": 15068,
+        "film_boxes": 1125,
+        "fact_refs": 56137,
+        "film_fact_refs": 13313,
+        "link_refs": 0
+      }
+    },
+    "links-select": {
+      "profile": "links-select",
+      "cpu": 7,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 198.428,
+        "peak_rss_kib": 33412,
+        "user_seconds": 169.447,
+        "system_seconds": 4.236,
+        "sampled_temporary_file_bytes": 658529702
+      },
+      "pack": {
+        "wall_seconds": 1.942,
+        "peak_rss_kib": 9608,
+        "user_seconds": 0.04,
+        "system_seconds": 1.127,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 196.555,
+        "peak_rss_kib": 27896,
+        "user_seconds": 154.889,
+        "system_seconds": 5.093,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 202998672,
+      "stream_sha256": "1cc70715930320364065068a8a71297dc9318564d4a64cd1ebbb69c2df9b827a",
+      "archive_bytes": 203132624,
+      "archive_sha256": "71f8919ffb9df90f57f0fe4a6d16c455c755150dbd517b48d3f59857046a6586",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613332,
+        "matched_source_bytes": 103811079,
+        "title_refs": 1817169,
+        "boxes": 0,
+        "film_boxes": 0,
+        "fact_refs": 0,
+        "film_fact_refs": 0,
+        "link_refs": 114684
+      }
+    },
+    "article-select": {
+      "profile": "article-select",
+      "cpu": 8,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 200.344,
+        "peak_rss_kib": 32440,
+        "user_seconds": 169.756,
+        "system_seconds": 4.097,
+        "sampled_temporary_file_bytes": 658283701
+      },
+      "pack": {
+        "wall_seconds": 1.926,
+        "peak_rss_kib": 9612,
+        "user_seconds": 0.049,
+        "system_seconds": 0.894,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 184.2,
+        "peak_rss_kib": 30012,
+        "user_seconds": 155.154,
+        "system_seconds": 4.353,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 203001777,
+      "stream_sha256": "290c8520c1dc6c0ec080e97c704dd5ecb2145f43eab6eba0453006ba85c48fcc",
+      "archive_bytes": 203135729,
+      "archive_sha256": "f33c916d3fef2fcbe7cd820a22761ca04c36b5aeee68d6e42e7f8c2b4c8a1179",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 133952,
+      "encoder_executable_sha256": "29f26aaa39222868e7aba95d0390d8bd4bccf9a2c75d087dce150049bb0372e9",
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613332,
+        "matched_source_bytes": 103811349,
+        "title_refs": 1814414,
+        "boxes": 15068,
+        "film_boxes": 1125,
+        "fact_refs": 56137,
+        "film_fact_refs": 13313,
+        "link_refs": 112734
+      }
+    }
+  },
+  "film_pilot": {
+    "pages": 1118,
+    "bytes": 9162172,
+    "sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+    "jaws_name_repeats_after_infobox": 8,
+    "runs": {
+      "wiki": {
+        "profile": "wiki",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 4.833,
+          "peak_rss_kib": 25272,
+          "user_seconds": 2.042,
+          "system_seconds": 0.06,
+          "sampled_temporary_file_bytes": 6473247
+        },
+        "pack": {
+          "wall_seconds": 0.051,
+          "peak_rss_kib": 7776,
+          "user_seconds": 0.02,
+          "system_seconds": 0.0,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 4.353,
+          "peak_rss_kib": 25768,
+          "user_seconds": 1.882,
+          "system_seconds": 0.031,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2072961,
+        "stream_sha256": "c582813bf30938af18481f32e8d015f5b518f6ac9d028cd7742938cba12abda2",
+        "archive_bytes": 2206913,
+        "archive_sha256": "ceec9df3589aa29e7c1e7e4fb40fe823c3f96973e47a739f8d8c80bec9b30005",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1595,
+          "matched_source_bytes": 77970,
+          "title_refs": 12026
+        }
+      },
+      "film": {
+        "profile": "film",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 4.567,
+          "peak_rss_kib": 25372,
+          "user_seconds": 1.942,
+          "system_seconds": 0.044,
+          "sampled_temporary_file_bytes": 6345663
+        },
+        "pack": {
+          "wall_seconds": 0.052,
+          "peak_rss_kib": 7772,
+          "user_seconds": 0.019,
+          "system_seconds": 0.0,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 3.973,
+          "peak_rss_kib": 27764,
+          "user_seconds": 1.692,
+          "system_seconds": 0.072,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2049989,
+        "stream_sha256": "54bbb377aa8646b3eb4668adb56015ca3a05bdef88f46e2877244167cc065226",
+        "archive_bytes": 2183941,
+        "archive_sha256": "69eb5b9bd8cf232f2d008e3785bf61ddcfa775d7c55e1c28d5e619d8f8dc81d5",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1581,
+          "matched_source_bytes": 78201,
+          "title_refs": 3185,
+          "boxes": 1123,
+          "film_boxes": 1123,
+          "fact_refs": 26213,
+          "film_fact_refs": 26213,
+          "link_refs": 0
+        }
+      },
+      "facts": {
+        "profile": "facts",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 4.976,
+          "peak_rss_kib": 25372,
+          "user_seconds": 2.113,
+          "system_seconds": 0.067,
+          "sampled_temporary_file_bytes": 6345946
+        },
+        "pack": {
+          "wall_seconds": 0.051,
+          "peak_rss_kib": 7648,
+          "user_seconds": 0.015,
+          "system_seconds": 0.0,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 8.001,
+          "peak_rss_kib": 30816,
+          "user_seconds": 3.482,
+          "system_seconds": 0.078,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2050169,
+        "stream_sha256": "ebfd75270dd8db4a32b308496b3e134f114be76ccc481ed4008bd9c8e51017b4",
+        "archive_bytes": 2184121,
+        "archive_sha256": "4c51855758071c523dbd7583a7fcaedd0d4d63093c62ad3d8814c9fbd9d9d5da",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1579,
+          "matched_source_bytes": 77974,
+          "title_refs": 3295,
+          "boxes": 1127,
+          "film_boxes": 1123,
+          "fact_refs": 26020,
+          "film_fact_refs": 26019,
+          "link_refs": 0
+        }
+      },
+      "links": {
+        "profile": "links",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 4.262,
+          "peak_rss_kib": 25440,
+          "user_seconds": 1.852,
+          "system_seconds": 0.042,
+          "sampled_temporary_file_bytes": 6389273
+        },
+        "pack": {
+          "wall_seconds": 0.051,
+          "peak_rss_kib": 7768,
+          "user_seconds": 0.015,
+          "system_seconds": 0.004,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 4.684,
+          "peak_rss_kib": 28976,
+          "user_seconds": 1.983,
+          "system_seconds": 0.061,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2064558,
+        "stream_sha256": "0eed99b1f239cfc2842657c6b4798046a062dc5a29ffbcef92f592926632af69",
+        "archive_bytes": 2198510,
+        "archive_sha256": "4a671c587d9e6c0c98e9bf708766ae33d0fb281e42cd2e7a793a5a62e6a3ba4e",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1601,
+          "matched_source_bytes": 78939,
+          "title_refs": 11900,
+          "boxes": 0,
+          "film_boxes": 0,
+          "fact_refs": 0,
+          "film_fact_refs": 0,
+          "link_refs": 11936
+        }
+      },
+      "article": {
+        "profile": "article",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 5.159,
+          "peak_rss_kib": 23832,
+          "user_seconds": 2.156,
+          "system_seconds": 0.092,
+          "sampled_temporary_file_bytes": 6317043
+        },
+        "pack": {
+          "wall_seconds": 0.051,
+          "peak_rss_kib": 7868,
+          "user_seconds": 0.02,
+          "system_seconds": 0.0,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 4.503,
+          "peak_rss_kib": 30964,
+          "user_seconds": 1.878,
+          "system_seconds": 0.077,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2051083,
+        "stream_sha256": "d6b5e6ca6b7a922379fdba4dbfcbdf020bf532c18bf083e69536d7f51ba658a2",
+        "archive_bytes": 2185035,
+        "archive_sha256": "ea3125b4ba4930992732ad70f29b7e8e7f59bd4e91270ad233d4ed210219fa3d",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1566,
+          "matched_source_bytes": 77800,
+          "title_refs": 3284,
+          "boxes": 1127,
+          "film_boxes": 1123,
+          "fact_refs": 26020,
+          "film_fact_refs": 26019,
+          "link_refs": 4235
+        }
+      },
+      "facts-select": {
+        "profile": "facts-select",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 5.151,
+          "peak_rss_kib": 25376,
+          "user_seconds": 2.237,
+          "system_seconds": 0.056,
+          "sampled_temporary_file_bytes": 6406071
+        },
+        "pack": {
+          "wall_seconds": 0.052,
+          "peak_rss_kib": 7728,
+          "user_seconds": 0.009,
+          "system_seconds": 0.009,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 4.378,
+          "peak_rss_kib": 27848,
+          "user_seconds": 1.829,
+          "system_seconds": 0.07,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2051759,
+        "stream_sha256": "e6a226ab386a5803fec426759353d868acb0939dfea9366f7fc22853c2efeb1e",
+        "archive_bytes": 2185711,
+        "archive_sha256": "0a03b1937129dc52390d0d7fc2d87808c6933a7905697ee0bbf256fbe753afd4",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1594,
+          "matched_source_bytes": 78113,
+          "title_refs": 11983,
+          "boxes": 1127,
+          "film_boxes": 1123,
+          "fact_refs": 13343,
+          "film_fact_refs": 13343,
+          "link_refs": 0
+        }
+      },
+      "links-select": {
+        "profile": "links-select",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 4.686,
+          "peak_rss_kib": 25380,
+          "user_seconds": 1.968,
+          "system_seconds": 0.064,
+          "sampled_temporary_file_bytes": 6395458
+        },
+        "pack": {
+          "wall_seconds": 0.051,
+          "peak_rss_kib": 7772,
+          "user_seconds": 0.01,
+          "system_seconds": 0.005,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 4.605,
+          "peak_rss_kib": 28156,
+          "user_seconds": 1.951,
+          "system_seconds": 0.068,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2074555,
+        "stream_sha256": "4e4cf1dca18fa726299f467ee041133da4e51bc9cf0658fd088775b29704deab",
+        "archive_bytes": 2208507,
+        "archive_sha256": "807f6742f9ff261c845497113ef8b3c820dd98fb47bba737123b2a898d9477de",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1595,
+          "matched_source_bytes": 77970,
+          "title_refs": 11976,
+          "boxes": 0,
+          "film_boxes": 0,
+          "fact_refs": 0,
+          "film_fact_refs": 0,
+          "link_refs": 1794
+        }
+      },
+      "article-select": {
+        "profile": "article-select",
+        "cpu": 6,
+        "machine": "x86_64",
+        "kernel": "6.18.57",
+        "executable_sha256": "7ca32e3ae0bf49208fd6e65044516c83471bcec6398d9e1a107ee30955873638",
+        "input_bytes": 9162172,
+        "input_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+        "encode": {
+          "wall_seconds": 5.055,
+          "peak_rss_kib": 23832,
+          "user_seconds": 2.168,
+          "system_seconds": 0.055,
+          "sampled_temporary_file_bytes": 6397361
+        },
+        "pack": {
+          "wall_seconds": 0.054,
+          "peak_rss_kib": 7728,
+          "user_seconds": 0.019,
+          "system_seconds": 0.0,
+          "sampled_temporary_file_bytes": 0
+        },
+        "standalone_decode": {
+          "wall_seconds": 4.335,
+          "peak_rss_kib": 30152,
+          "user_seconds": 1.848,
+          "system_seconds": 0.044,
+          "sampled_temporary_file_bytes": 0
+        },
+        "stream_bytes": 2052913,
+        "stream_sha256": "54c826b763e78ffbe7f8e32291a45104a8e9d151f2a762279456dfdd5fdb3de8",
+        "archive_bytes": 2186865,
+        "archive_sha256": "98661e330bb295ac1f238779ecfa518cbd8cc5ed51089f95db1b9589921d1698",
+        "restored_sha256": "3c89d6cfb611abf807fb7e2bd25d57b8c2c8fc5cd8141bee9f8c41bb03cf80d4",
+        "byte_comparison": true,
+        "canonical_enwik9": false,
+        "decoder_and_trailer_bytes": 133952,
+        "observations": {
+          "vocabulary": 23152,
+          "template_hits": 1594,
+          "matched_source_bytes": 78113,
+          "title_refs": 11930,
+          "boxes": 1127,
+          "film_boxes": 1123,
+          "fact_refs": 13343,
+          "film_fact_refs": 13343,
+          "link_refs": 932
+        }
+      }
+    }
+  },
+  "optional_film_order": [
+    {
+      "profile": "film-order",
+      "cpu": 1,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "cc8411e551ddeb4adf3219d236236fd81c79c7c6b1e7d8dea016e3c2e09af842",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 199.266,
+        "peak_rss_kib": 32404,
+        "user_seconds": 145.275,
+        "system_seconds": 5.103,
+        "sampled_temporary_file_bytes": 659486533
+      },
+      "pack": {
+        "wall_seconds": 0.202,
+        "peak_rss_kib": 7772,
+        "user_seconds": 0.008,
+        "system_seconds": 0.164,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 140.514,
+        "peak_rss_kib": 26732,
+        "user_seconds": 135.657,
+        "system_seconds": 4.101,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 202813746,
+      "stream_sha256": "bc83ccda8950a4002d08e3584f81a38fa0369ab434c0f38441013c8f53684949",
+      "archive_bytes": 202951746,
+      "archive_sha256": "b35055a32c527c3a672aba209514069661b17fc95fec305c45fd2de3abc9fc9e",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 138000,
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613365,
+        "matched_source_bytes": 103810362,
+        "title_refs": 1822666
+      }
+    },
+    {
+      "profile": "film-group",
+      "cpu": 2,
+      "machine": "x86_64",
+      "kernel": "6.18.57",
+      "executable_sha256": "cc8411e551ddeb4adf3219d236236fd81c79c7c6b1e7d8dea016e3c2e09af842",
+      "input_bytes": 1000000000,
+      "input_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+      "encode": {
+        "wall_seconds": 200.02,
+        "peak_rss_kib": 30184,
+        "user_seconds": 149.292,
+        "system_seconds": 4.275,
+        "sampled_temporary_file_bytes": 659428021
+      },
+      "pack": {
+        "wall_seconds": 0.252,
+        "peak_rss_kib": 7776,
+        "user_seconds": 0.012,
+        "system_seconds": 0.196,
+        "sampled_temporary_file_bytes": 0
+      },
+      "standalone_decode": {
+        "wall_seconds": 142.536,
+        "peak_rss_kib": 26896,
+        "user_seconds": 137.876,
+        "system_seconds": 3.912,
+        "sampled_temporary_file_bytes": 0
+      },
+      "stream_bytes": 202828774,
+      "stream_sha256": "72b50d46fe9bf0353e7cf9400d92b807efefddcc00d923808a759bd341f6079d",
+      "archive_bytes": 202966774,
+      "archive_sha256": "76cd81da48b5d365a3e0772393135aaad940f8856c0954c365e07ca3e3c808d8",
+      "restored_sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc",
+      "byte_comparison": true,
+      "canonical_enwik9": true,
+      "decoder_and_trailer_bytes": 138000,
+      "observations": {
+        "vocabulary": 32768,
+        "template_hits": 613337,
+        "matched_source_bytes": 103809108,
+        "title_refs": 1813858,
+        "boxes": 1124,
+        "film_boxes": 1124,
+        "fact_refs": 26135,
+        "film_fact_refs": 26135,
+        "link_refs": 0
+      }
+    }
+  ],
+  "article_validation": "Eight full streams were encoded, then independently packaged and restored with the final CLI. The final reader adds a retry for libarchive chunk-boundary truncation. Each row identifies both encoder and released decoder executable hashes. Film-sample runs use the final CLI throughout. The two optional page-order comparisons used the experimental executable recorded in their receipts.",
+  "checks": [
+    "canonical SHA-256 and complete byte comparisons",
+    "150 profile/fixture combinations plus article rank, page boundary, corruption and standalone cases",
+    "6 legacy word-codec tests",
+    "native startup image plus 344 short cases",
+    "bidirectional v0.0.4 compatibility on the Jaws Wiki stream",
+    "invalid hybrid inputs, including a same-length wrong hash, rejected",
+    "existing output preserved and corrupted film-sample archive rejected",
+    "identical code rebuilt from bundled cmix-neif sources"
+  ]
+}

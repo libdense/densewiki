@@ -23,6 +23,7 @@ int archive_write_set_format_7zip(archive*), archive_write_set_options(archive*,
     archive_read_support_format_7zip(archive*),archive_read_set_seek_callback(archive*,int64_t(*)(archive*,void*,int64_t,int)),
     archive_read_open2(archive*,void*,int(*)(archive*,void*),ssize_t(*)(archive*,void*,const void**),
                       int64_t(*)(archive*,void*,int64_t),int(*)(archive*,void*)),
+    archive_read_open_memory(archive*,const void*,size_t),
     archive_read_next_header(archive*,archive_entry**),archive_read_close(archive*),archive_read_free(archive*);
 ssize_t archive_write_data(archive*,const void*,size_t),archive_read_data(archive*,void*,size_t);
 }
@@ -126,6 +127,20 @@ public:
         archive_entry *e=nullptr;
         require(archive_read_next_header(a.get(),&e)==0 && archive_entry_pathname(e) &&
                 !std::strcmp(archive_entry_pathname(e),"DWX4"),"missing DWX4 member");
+    }
+    bool reported_truncation() const {
+        const char *message = archive_error_string(a.get());
+        return message && std::strcmp(message, "Truncated 7z file data") == 0;
+    }
+    void reopen_contiguous(const void *data, size_t bytes) {
+        a.reset(archive_read_new());
+        require(bool(a), "cannot allocate archive reader");
+        pos = available = 0;
+        archive_ok(a.get(), archive_read_support_format_7zip(a.get()));
+        archive_ok(a.get(), archive_read_open_memory(a.get(), data, bytes));
+        archive_entry *entry = nullptr;
+        require(archive_read_next_header(a.get(), &entry) == 0 && archive_entry_pathname(entry) &&
+                std::strcmp(archive_entry_pathname(entry), "DWX4") == 0, "missing DWX4 member");
     }
     void read(char *dst,size_t n) {
         while(n) {
